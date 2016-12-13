@@ -27,7 +27,7 @@ import kafka.utils.TestUtils;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import kafka.zk.EmbeddedZookeeper;
-
+import org.junit.runners.MethodSorters;
 
 
 /**
@@ -42,6 +42,7 @@ import kafka.zk.EmbeddedZookeeper;
  * http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/consumer/ConsumerRecord.html
  * http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/producer/ProducerRecord.html
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class KafkaConsumerProducerTest {
 
     private static final String ZKHOST = "127.0.0.1";
@@ -150,7 +151,6 @@ public class KafkaConsumerProducerTest {
             while (scanner.hasNextLine()) {
                 lines++;
                 String line = scanner.nextLine();
-                //TODO: Make sure to use the ProducerRecord constructor that does not take partition Id
                 ProducerRecord<Integer, byte[]> rec = new ProducerRecord<>(TOPIC_JSON, line.getBytes(StandardCharsets.UTF_8));
                 producer.send(rec);
 
@@ -174,9 +174,14 @@ public class KafkaConsumerProducerTest {
         }
     }
 
-    // TODO use the log-tracer to consume
+    @Test
+    @Ignore
     public void testLogTracer(){
-
+        String[] args = new String[3];
+        args[0] = "--hostname=" + BROKERHOST;
+        args[1] = "--port=" + BROKERPORT;
+        args[2] = "--topic=" + TOPIC_JSON;
+        LogTracerApp.main(args);
     }
 
 
