@@ -104,7 +104,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
                 <configuration>
-                    <mainClass>dk.dbc.kafka.App</mainClass>
+                    <mainClass>dk.dbc.kafka.LogTracerApp</mainClass>
                 </configuration>
             </plugin>
 
@@ -130,7 +130,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>dk.dbc.kafka.App</mainClass>
+                            <mainClass>dk.dbc.kafka.LogTracerApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

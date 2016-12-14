@@ -137,7 +137,7 @@ public class KafkaConsumerProducerTest {
     @Test
     public void testJsonProducer() throws InterruptedException, IOException {
 
-        KafkaProducer<Integer, byte[]> producer = new KafkaProducer<Integer, byte[]>(producerProps);
+        KafkaProducer<Integer, byte[]> producer = new KafkaProducer<>(producerProps);
 
         KafkaConsumer<Integer, byte[]> consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Arrays.asList(TOPIC_JSON));
@@ -175,15 +175,58 @@ public class KafkaConsumerProducerTest {
     }
 
     @Test
-    @Ignore
     public void testLogTracer(){
+        KafkaProducer<Integer, byte[]> producer = new KafkaProducer<>(producerProps);
+
+        // send many messages
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("json-formatted-sample-data.txt").getFile());
+
+        int lines = 0;
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                lines++;
+                String line = scanner.nextLine();
+                ProducerRecord<Integer, byte[]> rec = new ProducerRecord<>(TOPIC_JSON + "xx", line.getBytes(StandardCharsets.UTF_8));
+                producer.send(rec);
+
+            }
+            scanner.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        producer.close();
+
+
         String[] args = new String[3];
         args[0] = "--hostname=" + BROKERHOST;
         args[1] = "--port=" + BROKERPORT;
-        args[2] = "--topic=" + TOPIC_JSON;
-        LogTracerApp.main(args);
+        args[2] = "--topic=" + TOPIC_JSON + "xx";
+        assertTrue(LogTracerApp.main(args));
     }
 
+
+
+    @Test
+    public void testEmptyTopicLogTracer(){
+        String[] args = new String[3];
+        args[0] = "--hostname=" + BROKERHOST;
+        args[1] = "--port=" + BROKERPORT;
+        args[2] = "--topic=" + "not_a_topic";
+        assertFalse(LogTracerApp.main(args));
+    }
+
+
+    @Test
+    @Ignore
+    public void testNoHostnameLogTracer(){
+        String[] args = new String[3];
+        args[0] = "--port=" + BROKERPORT;
+        args[1] = "--topic=" + "not_a_topic";
+        assertFalse(LogTracerApp.main(args));
+    }
 
     @After
     public void closeDown(){
