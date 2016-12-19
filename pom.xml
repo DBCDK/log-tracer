@@ -80,6 +80,9 @@
                 </configuration>
             </plugin>
 
+
+
+
             <!-- any other plugins -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -92,6 +95,11 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>dk.dbc.kafka.LogTracerApp</mainClass>
+                        </manifest>
+                    </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>

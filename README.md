@@ -7,6 +7,22 @@ Log-tracer will be a commandline-tool for developers who wants to extract logs f
 
 
 
+# usage
+```bash
+$ mvn install
+
+$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname localhost --port 9092 --topic test
+
+or via maven the build tool.
+
+$ mvn exec:java -Dexec.mainClass='dk.dbc.kafka.LogTracerApp' -Dexec.arguments="--hostname=localhost,--port=9092,--topic=test"
+
+ -?,--help             shows this message
+ -dt,--time <arg>      The relevant timeperiod you want log data from
+ -h,--hostname <arg>   The kafka host you want to connect to
+ -p,--port <arg>        the port of the kafka host
+ -t,--topic <arg>      The kafka topic you want to consume
+```
 
 # Log format
 The JSON message format for all log-events

@@ -4,6 +4,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -27,14 +28,14 @@ public class Cli {
         Option helpOption = Option.builder("?")
                 .longOpt("help")
                 .required(false)
-                .desc("shows this message")
+                .desc("Shows this usage message")
                 .build();
 
         Option kafkaHostname = Option.builder("h")
                 .longOpt("hostname")
                 .numberOfArgs(1)
                 .required(true)
-                .desc("The kafka host you want to connect to")
+                .desc("Kafka host you want to connect to")
                 .build();
 
 
@@ -43,21 +44,26 @@ public class Cli {
                 .numberOfArgs(1)
                 .required(true)
                 .type(Number.class)
-                .desc(" the port of the kafka host")
+                .desc("Port of the kafka host")
                 .build();
 
         Option kafkaTopic = Option.builder("t")
                 .longOpt("topic")
                 .numberOfArgs(1)
                 .required(true)
-                .desc("The kafka topic you want to consume")
+                .desc("Kafka topic you want to consume")
                 .build();
+
+        // TODO listen functionality, keep consuming
+        // TODO write consumed records output to file option
+        // TODO write consumed output to stdout
+        // TODO Consume a list of topics
 
         Option data_timeperiod = Option.builder("dt")
                 .longOpt("time")
                 .numberOfArgs(1)
                 .required(false)
-                .desc("The relevant timeperiod you want log data from")
+                .desc("Relevant time period you want data from")
                 .build();
 
 
@@ -88,7 +94,7 @@ public class Cli {
 
             if(!cmdLine.hasOption("hostname") || !cmdLine.hasOption("topic") || !cmdLine.hasOption("port") ){
                 showHelp();
-                return null;
+                throw new MissingArgumentException("missing required arguments");
             } else {
                 return cmdLine;
             }
@@ -105,8 +111,6 @@ public class Cli {
     public void showHelp(){
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("Log Tracer", options);
-
     }
-
 
 }
