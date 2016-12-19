@@ -9,6 +9,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.logging.Logger;
 
 /**
@@ -16,9 +19,10 @@ import java.util.logging.Logger;
  */
 public class Cli {
 
-    private static final Logger log = Logger.getLogger(Cli.class.getName());
     private String[] args = null;
     private Options options = new Options();
+    private static Logger LOGGER = Logger.getLogger("Cli");
+
 
 
     public Cli(String[] args) {
@@ -54,9 +58,15 @@ public class Cli {
                 .desc("Kafka topic you want to consume")
                 .build();
 
+
+        Option storeTofile = Option.builder("s")
+                .longOpt("store")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("Store consumed record to a file")
+                .build();
+
         // TODO listen functionality, keep consuming
-        // TODO write consumed records output to file option
-        // TODO write consumed output to stdout
         // TODO Consume a list of topics
 
         Option data_timeperiod = Option.builder("dt")
@@ -69,10 +79,10 @@ public class Cli {
 
         // add t option
         options.addOption(helpOption);
-
         options.addOption(kafkaHostname);
         options.addOption(portOption);
         options.addOption(kafkaTopic);
+        options.addOption(storeTofile);
         options.addOption(data_timeperiod);
 
     }
@@ -84,12 +94,17 @@ public class Cli {
             CommandLine cmdLine = parser.parse( options, args );
 
             for (Option option: cmdLine.getOptions()) {
-                System.out.println(option.getLongOpt() + " = " + option.getValue());
+                LOGGER.fine(option.getLongOpt() + " = " + option.getValue());
 
             }
             if (cmdLine.hasOption("help")) {
                 showHelp();
                 return null;
+            }
+            if(cmdLine.hasOption("store")) {
+                String outputFileName = cmdLine.hasOption("store") ? ((String)cmdLine.getParsedOptionValue("store")) : "output.json";
+                PrintStream out = new PrintStream(new FileOutputStream(outputFileName));
+                System.setOut(out);
             }
 
             if(!cmdLine.hasOption("hostname") || !cmdLine.hasOption("topic") || !cmdLine.hasOption("port") ){
@@ -102,8 +117,12 @@ public class Cli {
         }
         catch( ParseException exp ) {
             // oops, something went wrong
-            System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
+            LOGGER.severe("Encountered exception while parsing arguments:\n  Reason: " + exp.getMessage() );
             showHelp();
+            return null;
+        } catch (FileNotFoundException e) {
+            LOGGER.severe("Encountered problems saving output to file");
+            e.printStackTrace();
             return null;
         }
     }
