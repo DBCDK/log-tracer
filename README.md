@@ -17,11 +17,13 @@ or via maven the build tool.
 
 $ mvn exec:java -Dexec.mainClass='dk.dbc.kafka.LogTracerApp' -Dexec.arguments="--hostname=localhost,--port=9092,--topic=test"
 
- -?,--help             shows this message
- -dt,--time <arg>      The relevant timeperiod you want log data from
- -h,--hostname <arg>   The kafka host you want to connect to
- -p,--port <arg>        the port of the kafka host
- -t,--topic <arg>      The kafka topic you want to consume
+ -?,--help             Shows this usage message
+ -dt,--time <arg>      Relevant time period you want data from
+ -h,--hostname <arg>   Kafka host you want to connect to
+ -p,--port <arg>       Port of the kafka host
+ -s,--store <arg>      Store consumed record to a file
+ -t,--topic <arg>      Kafka topic you want to consume
+
 ```
 
 # Log format

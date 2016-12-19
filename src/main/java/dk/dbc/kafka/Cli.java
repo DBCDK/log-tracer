@@ -63,7 +63,7 @@ public class Cli {
                 .longOpt("store")
                 .numberOfArgs(1)
                 .required(false)
-                .desc("Store consumed record to a file")
+                .desc("Store consumed records to a file")
                 .build();
 
         // TODO listen functionality, keep consuming
