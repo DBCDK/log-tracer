@@ -47,7 +47,7 @@ public class KafkaConsumerProducerTest {
 
     private static final String ZKHOST = "127.0.0.1";
     private static final String BROKERHOST = "127.0.0.1";
-    private static final String BROKERPORT = "9092";
+    private static final String BROKERPORT = "9091";
     private static final String TOPIC = "test";
     private static final String TOPIC_JSON = "test_json";
     EmbeddedZookeeper zkServer;
@@ -178,18 +178,15 @@ public class KafkaConsumerProducerTest {
     public void testLogTracer(){
         KafkaProducer<Integer, byte[]> producer = new KafkaProducer<>(producerProps);
 
-        // send many messages
+        // send pre-formatted messages
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("json-formatted-sample-data.txt").getFile());
 
-        int lines = 0;
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
-                lines++;
                 String line = scanner.nextLine();
-                ProducerRecord<Integer, byte[]> rec = new ProducerRecord<>(TOPIC_JSON + "xx", line.getBytes(StandardCharsets.UTF_8));
+                ProducerRecord<Integer, byte[]> rec = new ProducerRecord<>(TOPIC_JSON + "_temp_topic", line.getBytes(StandardCharsets.UTF_8));
                 producer.send(rec);
-
             }
             scanner.close();
 
@@ -207,6 +204,18 @@ public class KafkaConsumerProducerTest {
     }
 
 
+    @Test
+    public void testFileOutput(){
+
+        String[] args = new String[4];
+        args[0] = "--hostname=" + BROKERHOST;
+        args[1] = "--port=" + BROKERPORT;
+        args[2] = "--topic=" + TOPIC_JSON;
+        args[3] = "--store=" + "fileoutput.json";
+
+        LogTracerApp.main(args);
+
+    }
 
     @Test
     public void testEmptyTopicLogTracer(){
@@ -230,5 +239,17 @@ public class KafkaConsumerProducerTest {
         kafkaServer.shutdown();
         zkClient.close();
         zkServer.shutdown();
+    }
+
+    private static void getAllFiles(File curDir){
+
+        File[] filesList = curDir.listFiles();
+        for (File f : filesList) {
+            if (f.isDirectory())
+                getAllFiles(f);
+            if (f.isFile()) {
+                System.out.println(f.getName());
+            }
+        }
     }
 }

@@ -66,6 +66,18 @@ public class Cli {
                 .desc("Store consumed records to a file")
                 .build();
 
+        Option offset = Option.builder("o")
+                .longOpt("offset")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("The consumer can starts from the beginning or the end of the topic [earliest, latest]")
+                .build();
+        Option clientID = Option.builder("i")
+                .longOpt("clientid")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("Provide a client ID that can identify the client and make ")
+                .build();
         // TODO listen functionality, keep consuming
         // TODO Consume a list of topics
 
@@ -83,6 +95,8 @@ public class Cli {
         options.addOption(portOption);
         options.addOption(kafkaTopic);
         options.addOption(storeTofile);
+        options.addOption(offset);
+        options.addOption(clientID);
         options.addOption(data_timeperiod);
 
     }
@@ -123,6 +137,10 @@ public class Cli {
         } catch (FileNotFoundException e) {
             LOGGER.severe("Encountered problems saving output to file");
             e.printStackTrace();
+            return null;
+        } catch (NullPointerException e){
+            LOGGER.severe("Missing basic arguments to logtracer");
+            // e.printStackTrace();
             return null;
         }
     }

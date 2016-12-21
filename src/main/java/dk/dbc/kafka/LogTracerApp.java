@@ -3,9 +3,7 @@ package dk.dbc.kafka;
 
 import org.apache.commons.cli.CommandLine;
 
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Arrays;
+
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -38,13 +36,13 @@ public class LogTracerApp
                 String hostname = cmdLine.hasOption("hostname") ? ((String) cmdLine.getParsedOptionValue("hostname")) : "localhost";
                 String port = cmdLine.hasOption("port") ? ((Number) cmdLine.getParsedOptionValue("port")).toString() : "2081";
                 String topic = cmdLine.hasOption("topic") ? ((String) cmdLine.getParsedOptionValue("topic")) : "test";
-                consumer.readKafkaTopics(hostname, port, topic, UUID.randomUUID().toString());
+                String offset = cmdLine.hasOption("offset") ? ((String) cmdLine.getParsedOptionValue("offset")) : "earliest";
+                String clientID = cmdLine.hasOption("clientid") ? ((String) cmdLine.getParsedOptionValue("clientid")) : UUID.randomUUID().toString();
+                consumer.readKafkaTopics(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
             } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.severe("Log Tracer could not retrieve records from Kafka topic. ");
             }
         }
-/*        System.out.println("Goodbye from Log tracer");
-        return false;*/
     }
 }
