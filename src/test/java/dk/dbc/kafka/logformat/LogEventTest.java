@@ -36,7 +36,7 @@ public class LogEventTest {
         LogEvent logEvent = createDummyObject(1);
 
         //1. Convert object to JSON string
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ").create();
         String json = gson.toJson(logEvent);
         System.out.println(json);
 
@@ -57,7 +57,7 @@ public class LogEventTest {
     @Test
     public void readLogEvent()
     {
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ").create();
 
         //2. Convert object to JSON string and save into a file directly
         try (FileWriter writer = new FileWriter("json-formatted-sample-data-generated.log")) {

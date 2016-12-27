@@ -2,6 +2,7 @@ package dk.dbc.kafka.logformat;
 
 import kafka.utils.Time;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 
@@ -9,9 +10,11 @@ import java.util.logging.Level;
  * Created by andreas on 12/22/16.
  */
 public class LogEvent {
+    private transient SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ"); // "2017-01-22T15:22:57.567824034+02:00",
     private Time kafkaTimestamp;
     private Date timestamp;
     private String host;
+    private String env;
     private String appID;
     //private Level level;
     String level;
@@ -70,7 +73,7 @@ public class LogEvent {
     public String toString() {
         return "LogEvent{" +
                 "kafkaTimestamp=" + kafkaTimestamp +
-                ", timestamp=" + timestamp +
+                ", timestamp=" + sdf.format(timestamp)+
                 ", host='" + host + '\'' +
                 ", appID='" + appID + '\'' +
                 ", level='" + level + '\'' +
