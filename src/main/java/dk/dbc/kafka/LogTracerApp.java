@@ -14,19 +14,19 @@ public class LogTracerApp
 {
     private static Logger LOGGER = Logger.getLogger("LogTracerApp");
 
-    public static void main(String[] args )
+    public static void main(String[] args)
     {
         LOGGER.info("Log tracer has been started");
 
-        Cli cli = null;
+        Cli cliParser = null;
         CommandLine cmdLine = null;
         try {
-            cli = new Cli(args);
-            cmdLine = cli.parse();
+            cliParser = new Cli(args);
+            cmdLine = cliParser.parse();
         }catch (Exception e){
             e.printStackTrace();
-            if (cli != null) {
-                cli.showHelp();
+            if (cliParser != null) {
+                cliParser.showHelp();
               //  System.exit(0);
             }
         }
@@ -38,7 +38,7 @@ public class LogTracerApp
                 String topic = cmdLine.hasOption("topic") ? ((String) cmdLine.getParsedOptionValue("topic")) : "test";
                 String offset = cmdLine.hasOption("offset") ? ((String) cmdLine.getParsedOptionValue("offset")) : "earliest";
                 String clientID = cmdLine.hasOption("clientid") ? ((String) cmdLine.getParsedOptionValue("clientid")) : UUID.randomUUID().toString();
-                consumer.readKafkaTopics(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
+                consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
             } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.severe("Log Tracer could not retrieve records from Kafka topic. ");

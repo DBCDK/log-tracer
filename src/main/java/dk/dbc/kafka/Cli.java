@@ -12,6 +12,8 @@ import org.apache.commons.cli.ParseException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -23,6 +25,8 @@ public class Cli {
     private Options options = new Options();
     private static Logger LOGGER = Logger.getLogger("Cli");
 
+    String pattern = "yyyy-MM-dd'T'HH:mm";
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
 
     public Cli(String[] args) {
@@ -81,15 +85,42 @@ public class Cli {
         // TODO listen functionality, keep consuming
         // TODO Consume a list of topics
 
-        Option data_timeperiod = Option.builder("dt")
-                .longOpt("time")
+        Option data_timeperiod_start = Option.builder("ds")
+                .longOpt("data-start")
                 .numberOfArgs(1)
                 .required(false)
-                .desc("Relevant time period you want data from")
+                //.type(Date.class)
+                .desc("Relevant time period you want data from in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22")
                 .build();
 
+        Option data_timeperiod_end = Option.builder("de")
+                .longOpt("data-end")
+                .numberOfArgs(1)
+                .required(false)
+                //.type(Date.class)
+                .desc("Relevant time period you want data from in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T17:22")
+                .build();
 
-        // add t option
+        Option data_host = Option.builder("dh")
+                .longOpt("data-hostname")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("Relevant hostname in logs")
+                .build();
+
+        Option data_appid = Option.builder("da")
+                .longOpt("data-appid")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("Relevant data app name in logs")
+                .build();
+        Option data_loglevel = Option.builder("dl")
+                .longOpt("data-loglevel")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("Relevant log level i.e. INFO, DEBUG, WARN")
+                .build();
+
         options.addOption(helpOption);
         options.addOption(kafkaHostname);
         options.addOption(portOption);
@@ -97,10 +128,19 @@ public class Cli {
         options.addOption(storeTofile);
         options.addOption(offset);
         options.addOption(clientID);
-        options.addOption(data_timeperiod);
+        options.addOption(data_timeperiod_start);
+        options.addOption(data_timeperiod_end);
+        options.addOption(data_appid);
+        options.addOption(data_host);
+        options.addOption(data_loglevel);
 
     }
-    public CommandLine parse() {
+
+    /**
+     * Parse all arguments and do a simple validation. Do
+     * @return
+     */
+    public CommandLine parse() throws java.text.ParseException {
         CommandLineParser parser = new DefaultParser();         // create the parser
 
         try {
@@ -121,6 +161,29 @@ public class Cli {
                 System.setOut(out);
             }
 
+            if(cmdLine.hasOption("data-start")){
+                try {
+                    simpleDateFormat.parse((String)cmdLine.getParsedOptionValue("data-start"));
+                } catch (java.text.ParseException e) {
+                    showHelp();
+                    LOGGER.severe("Could not parse [" + cmdLine.getParsedOptionValue("data-start") +  "] data startdate "  + e.getMessage() );
+                    e.printStackTrace();
+                    throw e;
+
+                }
+            }
+
+            if(cmdLine.hasOption("data-end")){
+                try {
+                    simpleDateFormat.parse((String)cmdLine.getParsedOptionValue("data-end"));
+                } catch (java.text.ParseException e) {
+                    showHelp();
+                    LOGGER.severe("Could not parse [" + cmdLine.getParsedOptionValue("data-end") +  "] data enddate "  + e.getMessage() );
+                    e.printStackTrace();
+                    throw e;
+                }
+            }
+
             if(!cmdLine.hasOption("hostname") || !cmdLine.hasOption("topic") || !cmdLine.hasOption("port") ){
                 showHelp();
                 throw new MissingArgumentException("missing required arguments");
@@ -139,7 +202,7 @@ public class Cli {
             e.printStackTrace();
             return null;
         } catch (NullPointerException e){
-            LOGGER.severe("Missing basic arguments to logtracer");
+            LOGGER.severe("Missing basic arguments to log-tracer");
             // e.printStackTrace();
             return null;
         }

@@ -4,7 +4,6 @@ import kafka.utils.Time;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
 
 /**
  * Created by andreas on 12/22/16.
@@ -19,6 +18,21 @@ public class LogEvent {
     //private Level level;
     String level;
     private  String msg;
+
+    public boolean isInRelevantPeriod(Date start, Date end){
+        return ( start.before(timestamp) && end.after(timestamp));
+    }
+
+    public boolean isRelevantAppID(String relevantAppID){
+        return relevantAppID.equalsIgnoreCase(this.appID);
+    }
+
+    public boolean isRelevantHost(String relevantHost){
+        return relevantHost.equalsIgnoreCase(this.host);
+    }
+    public boolean isRelevantEnvironment(String relevantEnv){
+        return relevantEnv.equalsIgnoreCase(this.env);
+    }
 
 
     public Time getKafkaTimestamp() {
@@ -69,12 +83,20 @@ public class LogEvent {
         this.msg = msg;
     }
 
+    public String getEnv() {
+        return env;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
+    }
+
     @Override
     public String toString() {
         return "LogEvent{" +
-                "kafkaTimestamp=" + kafkaTimestamp +
-                ", timestamp=" + sdf.format(timestamp)+
+                "timestamp=" + timestamp +
                 ", host='" + host + '\'' +
+                ", env='" + env + '\'' +
                 ", appID='" + appID + '\'' +
                 ", level='" + level + '\'' +
                 ", msg='" + msg + '\'' +
