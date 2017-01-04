@@ -101,19 +101,28 @@ public class Cli {
                 .desc("Relevant time period you want data from in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T17:22")
                 .build();
 
-        Option data_host = Option.builder("dh")
-                .longOpt("data-hostname")
+        Option data_env = Option.builder("denv")
+                .longOpt("data-env")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("Relevant environment")
+                .build();
+
+        Option data_host = Option.builder("dhos")
+                .longOpt("data-host")
                 .numberOfArgs(1)
                 .required(false)
                 .desc("Relevant hostname in logs")
                 .build();
 
-        Option data_appid = Option.builder("da")
+        Option data_appid = Option.builder("dapp")
                 .longOpt("data-appid")
                 .numberOfArgs(1)
                 .required(false)
                 .desc("Relevant data app name in logs")
                 .build();
+
+
         Option data_loglevel = Option.builder("dl")
                 .longOpt("data-loglevel")
                 .numberOfArgs(1)
@@ -130,8 +139,9 @@ public class Cli {
         options.addOption(clientID);
         options.addOption(data_timeperiod_start);
         options.addOption(data_timeperiod_end);
-        options.addOption(data_appid);
+        options.addOption(data_env);
         options.addOption(data_host);
+        options.addOption(data_appid);
         options.addOption(data_loglevel);
 
     }
@@ -184,6 +194,20 @@ public class Cli {
                 }
             }
 
+            if((cmdLine.hasOption("data-host") && ((String)cmdLine.getParsedOptionValue("data-host")).isEmpty() ) ){
+                LOGGER.severe("Could not find log host but option was given" );
+                throw new NullPointerException("Empty value for option");
+
+            }            if((cmdLine.hasOption("data-env") && ((String)cmdLine.getParsedOptionValue("data-env")).isEmpty() ) ){
+                LOGGER.severe("Could not find log env but option was given" );
+                throw new NullPointerException("Empty value for option");
+
+            }            if((cmdLine.hasOption("data-appid") && ((String)cmdLine.getParsedOptionValue("data-appid")).isEmpty() ) ){
+                LOGGER.severe("Could not find log appid but option was given" );
+                throw new NullPointerException("Empty value for option");
+
+            }
+
             if(!cmdLine.hasOption("hostname") || !cmdLine.hasOption("topic") || !cmdLine.hasOption("port") ){
                 showHelp();
                 throw new MissingArgumentException("missing required arguments");
@@ -201,9 +225,10 @@ public class Cli {
             LOGGER.severe("Encountered problems saving output to file");
             e.printStackTrace();
             return null;
-        } catch (NullPointerException e){
-            LOGGER.severe("Missing basic arguments to log-tracer");
-            // e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            LOGGER.severe("Missing basic arguments to log-tracer" + e.getMessage() );
+             e.printStackTrace();
             return null;
         }
     }

@@ -4,6 +4,8 @@ package dk.dbc.kafka;
 import org.apache.commons.cli.CommandLine;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -13,6 +15,8 @@ import java.util.logging.Logger;
 public class LogTracerApp
 {
     private static Logger LOGGER = Logger.getLogger("LogTracerApp");
+    private static String pattern = "yyyy-MM-dd'T'HH:mm";
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
     public static void main(String[] args)
     {
@@ -38,6 +42,30 @@ public class LogTracerApp
                 String topic = cmdLine.hasOption("topic") ? ((String) cmdLine.getParsedOptionValue("topic")) : "test";
                 String offset = cmdLine.hasOption("offset") ? ((String) cmdLine.getParsedOptionValue("offset")) : "earliest";
                 String clientID = cmdLine.hasOption("clientid") ? ((String) cmdLine.getParsedOptionValue("clientid")) : UUID.randomUUID().toString();
+
+                // Relevant periode
+                if(cmdLine.hasOption("data-start") && cmdLine.hasOption("data-end")) {
+                    Date start = simpleDateFormat.parse((String) cmdLine.getParsedOptionValue("data-start"));
+                    Date end = simpleDateFormat.parse((String) cmdLine.getParsedOptionValue("data-end"));
+
+                    if (start != null && end != null) {
+                        consumer.setRelevantPeriod(start, end);
+                    }
+                }
+
+                // relevant env,host or app-id
+                if(cmdLine.hasOption("data-env")){
+                  consumer.setEnv(((String) cmdLine.getParsedOptionValue("data-env")));
+                }
+
+                if(cmdLine.hasOption("data-host")){
+                    consumer.setHost((String) cmdLine.getParsedOptionValue("data-host"));
+                }
+
+                if(cmdLine.hasOption("data-appid")){
+                    consumer.setHost((String) cmdLine.getParsedOptionValue("data-appid"));
+                }
+
                 consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
             } catch (Exception e) {
                 e.printStackTrace();

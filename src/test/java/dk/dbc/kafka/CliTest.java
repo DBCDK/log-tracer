@@ -52,12 +52,49 @@ public class CliTest {
         CommandLine parsedCli = cli.parse();
 
 
-        Date start = simpleDateFormat.parse((String)parsedCli.getParsedOptionValue("data-end"));
+        Date start = simpleDateFormat.parse((String)parsedCli.getParsedOptionValue("data-start"));
         Date end = simpleDateFormat.parse((String)parsedCli.getParsedOptionValue("data-end"));
 
         assertTrue(parsedCli.hasOption("store") && parsedCli.hasOption("topic") && parsedCli.hasOption("port") && parsedCli.hasOption("hostname") &&
                 parsedCli.hasOption("data-start") && parsedCli.hasOption("data-end"));
+        assertTrue( (start.getTime() > 0) && (end.getTime() > 0) && (end.getTime()> start.getTime()) );
     }
+
+    @Test
+    public void testCliArgsWithEnvHostAppID() throws ParseException, org.apache.commons.cli.ParseException {
+
+        String[] args = new String[6];
+        args[0] = "--hostname=" + "localhost";
+        args[1] = "--port=" + "9092";
+        args[2] = "--topic=" + "test-topic";
+        args[3] = "--data-host=" + "Mesos-node-7";
+        args[4] = "--data-appid=" + "superapp";
+        args[5] = "--data-env=" + "test";
+
+        Cli cli = new Cli(args);
+        CommandLine parsedCli = cli.parse();
+
+
+        assertTrue( parsedCli.hasOption("data-appid") );
+        assertTrue(  parsedCli.hasOption("data-env"));
+        assertTrue( parsedCli.hasOption("data-host"));
+
+    }
+
+/*    @Test
+    public void testCliArgsWithEnv() throws ParseException, org.apache.commons.cli.ParseException {
+
+        String[] args = new String[5];
+        args[0] = "--hostname=" + "localhost";
+        args[1] = "--port=" + "9092";
+        args[2] = "--topic=" + "test-topic";
+        args[4] = "--data-env=" + "test";
+
+        Cli cli = new Cli(args);
+        CommandLine parsedCli = cli.parse();
+
+        assertTrue(  parsedCli.hasOption("data-env"));
+    }*/
 
     @Test(expected = ParseException.class)
     public void testCliArgsWithWrongDate() throws ParseException {
