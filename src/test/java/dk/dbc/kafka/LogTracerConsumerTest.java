@@ -243,7 +243,7 @@ public class LogTracerConsumerTest {
         Consumer consumer = new Consumer();
         try {
             Date start = simpleDateFormat.parse("2017-01-16T00:00");
-            Date end = new Date();
+            Date end = simpleDateFormat.parse("2017-01-25T00:00");
             consumer.setRelevantPeriod(start, end);
         } catch (ParseException e) {
             e.printStackTrace();
