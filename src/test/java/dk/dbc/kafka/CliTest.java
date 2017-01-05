@@ -81,20 +81,36 @@ public class CliTest {
 
     }
 
-/*    @Test
+    @Test
     public void testCliArgsWithEnv() throws ParseException, org.apache.commons.cli.ParseException {
 
-        String[] args = new String[5];
+        String[] args = new String[4];
         args[0] = "--hostname=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
-        args[4] = "--data-env=" + "test";
+        args[3] = "--data-env=" + "test";
 
         Cli cli = new Cli(args);
         CommandLine parsedCli = cli.parse();
 
         assertTrue(  parsedCli.hasOption("data-env"));
-    }*/
+    }
+
+
+    @Test
+    public void testCliArgsWithLogHost() throws ParseException, org.apache.commons.cli.ParseException {
+
+        String[] args = new String[4];
+        args[0] = "--hostname=" + "localhost";
+        args[1] = "--port=" + "9092";
+        args[2] = "--topic=" + "test-topic";
+        args[3] = "--data-host=" + "mesos-1";
+
+        Cli cli = new Cli(args);
+        CommandLine parsedCli = cli.parse();
+
+        assertTrue(  parsedCli.hasOption("data-host"));
+    }
 
     @Test(expected = ParseException.class)
     public void testCliArgsWithWrongDate() throws ParseException {

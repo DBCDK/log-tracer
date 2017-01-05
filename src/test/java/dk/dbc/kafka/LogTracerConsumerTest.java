@@ -6,9 +6,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.UUID;
+import java.util.logging.Logger;
 
+import dk.dbc.kafka.logformat.LogEvent;
 import kafka.utils.SystemTime$;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -43,8 +47,9 @@ import org.junit.runners.MethodSorters;
  * http://kafka.apache.org/0100/javadoc/org/apache/kafka/clients/producer/ProducerRecord.html
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class KafkaConsumerProducerTest {
+public class LogTracerConsumerTest {
 
+    private static Logger LOGGER = Logger.getLogger("LogTracerConsumerTest");
     private static final String ZKHOST = "127.0.0.1";
     private static final String BROKERHOST = "127.0.0.1";
     private static final String BROKERPORT = "9091";
@@ -100,14 +105,7 @@ public class KafkaConsumerProducerTest {
         consumerProps.put("auto.offset.reset", "earliest");  // to make sure the consumer starts from the beginning of the topic
 
     }
-    /**
-     * Rigourous Test
-     */
-    @Test
-    public void testKafkaProducerIT()
-    {
-        assertTrue( true );
-    }
+
 
     @Test
     public void testProducer() throws InterruptedException, IOException {
@@ -173,6 +171,112 @@ public class KafkaConsumerProducerTest {
             System.out.println("(" +record.offset() + ") ##### " + new String(record.value(), StandardCharsets.UTF_8));
         }
     }
+
+
+    @Test
+    public void testConsumerAllRecords(){
+
+        sendTestLogEventsFromFile();
+
+        Consumer consumer = new Consumer();
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        LOGGER.info("Prod Log events = (" + output.size() + ")");
+
+        for (LogEvent event : output) {
+            LOGGER.info("event = " + event);
+        }
+        assertTrue(output.size()>0);
+    }
+
+    @Test
+    public void testConsumeProdLogEventsFromSpecificHost(){
+        sendTestLogEventsFromFile();
+
+        Consumer consumer = new Consumer();
+        consumer.setEnv("prod");
+        consumer.setHost("mesos-node-7");
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        LOGGER.info("Prod Log events = (" + output.size() + ")");
+
+        for (LogEvent event : output) {
+            LOGGER.info("event = " + event);
+        }
+        assertTrue(output.size()==2);
+    }
+
+    @Test
+    public void testConsumeLogEventsFromAppID(){
+        sendTestLogEventsFromFile();
+
+        Consumer consumer = new Consumer();
+        consumer.setAppID("superapp");
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        LOGGER.info("Prod Log events = (" + output.size() + ")");
+
+        for (LogEvent event : output) {
+            LOGGER.info("event = " + event);
+        }
+        assertTrue(output.size()==5);
+    }
+    @Test
+    public void testConsumeLogEventsFromNonExistingAppID(){
+        sendTestLogEventsFromFile();
+
+        Consumer consumer = new Consumer();
+        consumer.setAppID("None existing app");
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        assertTrue(output.size()==0);
+    }
+
+    @Test
+    public void testConsumeLogEventsFromSpecificHost(){
+        sendTestLogEventsFromFile();
+
+        Consumer consumer = new Consumer();
+        consumer.setHost("mesos-node-7");
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        LOGGER.info("Prod Log events = (" + output.size() + ")");
+
+        for (LogEvent event : output) {
+            LOGGER.info("event = " + event);
+        }
+        assertTrue(output.size()==2);
+    }
+
+    @Test
+    public void testConsumeProdLogEvents(){
+        sendTestLogEventsFromFile();
+
+        Consumer consumer = new Consumer();
+        consumer.setEnv("prod");
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        LOGGER.info("Prod Log events = (" + output.size() + ")");
+
+        for (LogEvent event : output) {
+            LOGGER.info("event = " + event);
+        }
+        assertTrue(output.size()==4);
+    }
+
+/*
+// TODO Test Log LEVEL
+    @Test
+    public void testConsumeWarnProdLogEvents(){
+        sendTestLogEventsFromFile();
+
+        Consumer consumer = new Consumer();
+        consumer.setEnv("prod");
+        consumer.setLevel("WARN");
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        LOGGER.info("Prod Log events = (" + output.size() + ")");
+
+        for (LogEvent event : output) {
+            LOGGER.info("event = " + event);
+        }
+        assertTrue(output.size()==1);
+    }*/
+
+// TODO Test Relevant period
 
     @Test
     public void testLogTracer(){
@@ -251,5 +355,30 @@ public class KafkaConsumerProducerTest {
                 System.out.println(f.getName());
             }
         }
+    }
+
+    private void sendTestLogEventsFromFile() {
+        KafkaProducer<Integer, byte[]> producer = new KafkaProducer<>(producerProps);
+
+        // send many messages
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("json-formatted-sample-data.txt").getFile());
+
+        int lines = 0;
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                lines++;
+                String line = scanner.nextLine();
+                ProducerRecord<Integer, byte[]> rec = new ProducerRecord<>("logevents", line.getBytes(StandardCharsets.UTF_8));
+                producer.send(rec);
+
+            }
+            scanner.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        producer.close();
     }
 }

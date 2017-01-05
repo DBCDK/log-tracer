@@ -7,17 +7,14 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  * Created by andreas on 12/8/16. Inspired by javaworld 'Big data messaging with Kafka, Part 1'
@@ -86,7 +83,7 @@ public class Consumer {
      * @param maxNumberOfRecords
      * @return
      */
-    public boolean readLogEventsFromTopic(String hostname, String port, String topicName, String groupId, String offset, String clientID, int maxNumberOfRecords) {
+    public List<LogEvent> readLogEventsFromTopic(String hostname, String port, String topicName, String groupId, String offset, String clientID, int maxNumberOfRecords) {
 
         // setup consumer
         Properties consumerProps = createKafkaConsumerProperties(hostname, port, groupId, offset, clientID);
@@ -94,13 +91,14 @@ public class Consumer {
 
         KafkaConsumer<Integer, byte[]> consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Arrays.asList(topicName));
+        List<LogEvent> output = new ArrayList<LogEvent>();
 
         // starting consumer
         ConsumerRecords<Integer, byte[]> records = consumer.poll(3000);
         Iterator<ConsumerRecord<Integer, byte[]>> recordIterator = records.iterator();
         if (records.count() == 0) {
             LOGGER.warning("No records found in topic");
-            return false;
+            return output;
         } else {
             LOGGER.info("Topic: " + topicName + " Count: " + records.count());
             LogEvent logEvent = null;
@@ -128,11 +126,14 @@ public class Consumer {
                     relevant = false;
                 }
 
-                if (relevant) System.out.println(logEvent);
+                if (relevant) {
+                    System.out.println(logEvent);
+                    output.add(logEvent);
+                }
             }
         }
 
-        return true;
+        return output;
     }
 
     private Properties createKafkaConsumerProperties(String hostname, String port, String groupId, String offset, String clientID) {
