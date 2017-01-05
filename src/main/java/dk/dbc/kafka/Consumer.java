@@ -108,9 +108,9 @@ public class Consumer {
                 ConsumerRecord<Integer, byte[]> record = recordIterator.next();
                 logEvent = gson.fromJson(new String(record.value(), StandardCharsets.UTF_8), LogEvent.class);
                 relevant = true;
+
                 //  filter events!
-                if (this.start != null && logEvent.getTimestamp().before(this.start) &&
-                        this.end != null && logEvent.getTimestamp().after(this.end)) {
+                if ((this.start != null && logEvent.getTimestamp().before(this.start)) || (this.end != null && logEvent.getTimestamp().after(this.end))) {
                     relevant = false;
                 }
 

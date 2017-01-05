@@ -1,11 +1,13 @@
 package dk.dbc.kafka;
 
 
+import dk.dbc.kafka.logformat.LogEvent;
 import org.apache.commons.cli.CommandLine;
 
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -66,10 +68,10 @@ public class LogTracerApp
                     consumer.setHost((String) cmdLine.getParsedOptionValue("data-appid"));
                 }
 
-                consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
+                List<LogEvent> x = consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
             } catch (Exception e) {
                 e.printStackTrace();
-                LOGGER.severe("Log Tracer could not retrieve records from Kafka topic. ");
+                LOGGER.severe("Log Tracer could not retrieve records from Kafka topic.");
             }
         }
     }
