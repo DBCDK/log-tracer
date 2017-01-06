@@ -38,6 +38,12 @@ public class Cli {
                 .required(false)
                 .desc("Shows this usage message")
                 .build();
+        Option produceOption = Option.builder("g")
+                .longOpt("generate-test-events")
+                .required(false)
+                .numberOfArgs(0)
+                .desc("Generate random log events. Simulating four different environments, application ids and hostnames. ")
+                .build();
 
         Option kafkaHostname = Option.builder("h")
                 .longOpt("hostname")
@@ -131,6 +137,7 @@ public class Cli {
                 .build();
 
         options.addOption(helpOption);
+        options.addOption(produceOption);
         options.addOption(kafkaHostname);
         options.addOption(portOption);
         options.addOption(kafkaTopic);
@@ -165,6 +172,7 @@ public class Cli {
                 showHelp();
                 return null;
             }
+
             if(cmdLine.hasOption("store")) {
                 String outputFileName = cmdLine.hasOption("store") ? ((String)cmdLine.getParsedOptionValue("store")) : "output.json";
                 PrintStream out = new PrintStream(new FileOutputStream(outputFileName));
@@ -197,17 +205,15 @@ public class Cli {
             if((cmdLine.hasOption("data-host") && ((String)cmdLine.getParsedOptionValue("data-host")).isEmpty() ) ){
                 LOGGER.severe("Could not find log host but option was given" );
                 throw new NullPointerException("Empty value for option");
-
-            }            if((cmdLine.hasOption("data-env") && ((String)cmdLine.getParsedOptionValue("data-env")).isEmpty() ) ){
+            }
+            if((cmdLine.hasOption("data-env") && ((String)cmdLine.getParsedOptionValue("data-env")).isEmpty() ) ){
                 LOGGER.severe("Could not find log env but option was given" );
                 throw new NullPointerException("Empty value for option");
-
-            }            if((cmdLine.hasOption("data-appid") && ((String)cmdLine.getParsedOptionValue("data-appid")).isEmpty() ) ){
+            }
+            if((cmdLine.hasOption("data-appid") && ((String)cmdLine.getParsedOptionValue("data-appid")).isEmpty() ) ){
                 LOGGER.severe("Could not find log appid but option was given" );
                 throw new NullPointerException("Empty value for option");
-
             }
-
             if(!cmdLine.hasOption("hostname") || !cmdLine.hasOption("topic") || !cmdLine.hasOption("port") ){
                 showHelp();
                 throw new MissingArgumentException("missing required arguments");

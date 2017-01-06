@@ -91,10 +91,14 @@ public class LogEvent {
         this.env = env;
     }
 
+    public String toJSON(){ // {"timestamp":"2017-01-12T08:00:00.000000000+02:00","host":"my-node","appID":"superapp","level":"WARN","env":"dev","msg":"the log message"}
+        return "{\"timestamp\":\"" + sdf.format(timestamp) + "\",\"host\":\"" + host + "\",\"appID\":\"" + appID +"\",\"level\":\"" +level +"\",\"env\":\""+ env + "\",\"msg\":\""+msg + "\"}";
+    }
+
     @Override
     public String toString() {
         return "LogEvent{" +
-                "timestamp=" + timestamp +
+                "timestamp=" + sdf.format(timestamp) +
                 ", host='" + host + '\'' +
                 ", env='" + env + '\'' +
                 ", appID='" + appID + '\'' +

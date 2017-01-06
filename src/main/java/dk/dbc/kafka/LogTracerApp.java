@@ -68,7 +68,13 @@ public class LogTracerApp
                     consumer.setHost((String) cmdLine.getParsedOptionValue("data-appid"));
                 }
 
-                List<LogEvent> x = consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
+                if (cmdLine.hasOption("generate-test-events")){
+                    ProduceTestData generateTestLogEvents = new ProduceTestData();
+                    generateTestLogEvents.produceTestData(hostname, port, topic);
+                    //System.out.println("End generated test events");
+                }else {
+                    List<LogEvent> x = consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 LOGGER.severe("Log Tracer could not retrieve records from Kafka topic.");

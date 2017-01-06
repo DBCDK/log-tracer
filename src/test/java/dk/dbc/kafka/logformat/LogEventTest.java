@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -51,6 +52,24 @@ public class LogEventTest {
         }
 
         assertTrue( logEvent != null );
+    }
+
+    @Test
+    public void toJson(){
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ").create();
+
+        LogEvent logEvent = createDummyObject(1);
+        String json = logEvent.toJSON();
+        LogEvent fromJson = gson.fromJson(json, LogEvent.class);
+        System.out.println("logEvent = " + logEvent);
+        System.out.println("json = " + json);
+        System.out.println("logEvent fromJson = " + fromJson);
+
+        assertTrue(json.contains("localhost"));
+        assertEquals(fromJson.getTimestamp(),logEvent.getTimestamp());
+        assertEquals(fromJson.getLevel(),logEvent.getLevel());
+        assertEquals(fromJson.getHost(),logEvent.getHost());
+
     }
 
 
@@ -93,6 +112,7 @@ public class LogEventTest {
      LogEvent logEvent = new LogEvent();
         logEvent.setAppID("UNIT-TEST");
         logEvent.setHost("localhost");
+        logEvent.setEnv("test");
         logEvent.setLevel(Level.INFO.getName());
         logEvent.setMsg("This is auto generated log message number " + id);
         logEvent.setTimestamp(new Date());
