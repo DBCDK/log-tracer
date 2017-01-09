@@ -86,7 +86,7 @@ public class Cli {
                 .longOpt("clientid")
                 .numberOfArgs(1)
                 .required(false)
-                .desc("Provide a client ID that can identify the client and make ")
+                .desc("Provide a client ID that can identify the client and make use of Kafkas built in offset")
                 .build();
         // TODO listen functionality, keep consuming
         // TODO Consume a list of topics
@@ -133,7 +133,7 @@ public class Cli {
                 .longOpt("data-loglevel")
                 .numberOfArgs(1)
                 .required(false)
-                .desc("Relevant log level i.e. ERROR, WARN, INFO, DEBUG, TRACE")
+                .desc("Relevant log level i.e. ERROR, WARN, INFO, DEBUG, TRACE. If you specify INFO you get ERROR, WARN and INFO. ")
                 .build();
 
 

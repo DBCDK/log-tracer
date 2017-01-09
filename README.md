@@ -6,7 +6,6 @@ Log-tracer will be a commandline-tool for developers who wants to extract logs f
 * manage for how long the log messages should be stored via Kafkas retention hours
 
 
-
 # installation
  You need to have Java JDK and the build tool Apache Maven
 ```bash
@@ -20,7 +19,7 @@ $ mvn exec:java -Dexec.mainClass='dk.dbc.kafka.LogTracerApp' -Dexec.arguments="-
 ```
 
 # usage 
-
+Log-tracer is a commandline tool and needs parameters related to the Kafka instance and optional parameters if filtering is needed. 
 ```bash
 
 $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar -?
@@ -32,14 +31,18 @@ usage: Log Tracer
                              2017-01-22T17:22
  -denv,--data-env <arg>      Relevant environment
  -dhos,--data-host <arg>     Relevant hostname in logs
- -dl,--data-loglevel <arg>   Relevant log level i.e. INFO, DEBUG, WARN
+ -dl,--data-loglevel <arg>   Relevant log level i.e. ERROR, WARN, INFO,
+                             DEBUG, TRACE. If you specify INFO you get
+                             ERROR, WARN and INFO.
  -ds,--data-start <arg>      Relevant time period you want data from in
                              the format yyyy-MM-dd'T'HH:mm i.e.
                              2017-01-22T13:22
- -g,--generate-test-events   generates test events to a kafka topic
+ -g,--generate-test-events   Generate random log events. Simulating four
+                             different environments, application ids and
+                             hostnames.
  -h,--hostname <arg>         Kafka host you want to connect to
  -i,--clientid <arg>         Provide a client ID that can identify the
-                             client and make
+                             client and make use of Kafkas built in offset
  -o,--offset <arg>           The consumer can starts from the beginning or
                              the end of the topic [earliest, latest]
  -p,--port <arg>             Port of the kafka host
@@ -49,7 +52,7 @@ usage: Log Tracer
 ```
 
 
-# generate test data
+# Generate test data
 If you need to verify your setup you might need to generate some test data and send to a kafka topic. Log-tracer has a built in command for that called --generate-test-events. A random log event is simulated to be from one of four environments; "dev", "test", "stage", "prod". 
 The hostname of the log event can be one of these "mesos-node-1", "mesos-node-2", "mesos-node-3", "oldfaithfull". Finally the application id can be "smooth-sink", "wild-webapp", "terrific-transformer", "dashing-database. 
 
@@ -83,7 +86,12 @@ $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname 
 
 $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname localhost --port 9092 --topic testtopic --data-app dashing-database
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname localhost --port 9092 --topic string --data-start 2017-01-06T15:05 --data-end 2017-01-06T15:06
+$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname localhost --port 9092 --topic testtopic --data-start 2017-01-06T15:05 --data-end 2017-01-06T15:06
+
+$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname localhost --port 9092 --topic testtopic --data-loglevel ERROR  --data-env prod 
+
+$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname localhost --port 9092 --topic testtopic --data-loglevel INFO
+
 
 
 ```
