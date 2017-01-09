@@ -4,6 +4,7 @@ import kafka.utils.Time;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.slf4j.event.Level;
 
 /**
  * Created by andreas on 12/22/16.
@@ -15,8 +16,7 @@ public class LogEvent {
     private String host;
     private String env;
     private String appID;
-    //private Level level;
-    String level;
+    private Level level; // ERROR int=40, WARN int=30, INFO int=20, DEBUG int=10, TRACE int=0
     private  String msg;
 
     public boolean isInRelevantPeriod(Date start, Date end){
@@ -67,13 +67,26 @@ public class LogEvent {
         this.appID = appID;
     }
 
-    public String getLevel() {
+    public Level getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(Level level) {
         this.level = level;
     }
+
+    /**
+     * Set the level from an int. ERROR int=40, WARN int=30, INFO int=20, DEBUG int=10, TRACE int=0
+     * @param level 0,10,20,30,40
+     */
+    public void setLevel(int level){
+        for (Level c : org.slf4j.event.Level.values()){
+            if(c.toInt()== level){
+                this.level = c;
+            }
+        }
+    }
+
 
     public String getMsg() {
         return msg;
@@ -102,7 +115,7 @@ public class LogEvent {
                 ", host='" + host + '\'' +
                 ", env='" + env + '\'' +
                 ", appID='" + appID + '\'' +
-                ", level='" + level + '\'' +
+                ", level='" + level.name() + '\'' +
                 ", msg='" + msg + '\'' +
                 '}';
     }

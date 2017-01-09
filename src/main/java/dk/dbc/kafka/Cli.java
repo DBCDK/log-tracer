@@ -133,8 +133,10 @@ public class Cli {
                 .longOpt("data-loglevel")
                 .numberOfArgs(1)
                 .required(false)
-                .desc("Relevant log level i.e. INFO, DEBUG, WARN")
+                .desc("Relevant log level i.e. ERROR, WARN, INFO, DEBUG, TRACE")
                 .build();
+
+
 
         options.addOption(helpOption);
         options.addOption(produceOption);

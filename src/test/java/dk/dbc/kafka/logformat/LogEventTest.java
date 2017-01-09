@@ -72,6 +72,27 @@ public class LogEventTest {
 
     }
 
+    @Test
+    public void testLogLevel(){
+        LogEvent dummyObject = createDummyObject(1);
+        System.out.println("dummyObject = " + dummyObject);
+        System.out.println("dummyObject.getLevel() = " + dummyObject.getLevel());
+        System.out.println("dummyObject.getLevel().toInt() = " + dummyObject.getLevel().toInt());
+        assertTrue(dummyObject.getLevel() != null);
+        assertTrue(dummyObject.getLevel().toInt() == 20);
+    }
+
+    @Test
+    public void testLevelToInt(){
+    int oneHundredIsTheSum = 0;
+        for (org.slf4j.event.Level c : org.slf4j.event.Level.values()) {
+            System.out.print(c);
+            System.out.println(" int=" + c.toInt());
+            oneHundredIsTheSum+= c.toInt();
+        }
+        assertEquals(oneHundredIsTheSum, 100);
+    }
+
 
     @Test
     public void readLogEvent()
@@ -113,7 +134,7 @@ public class LogEventTest {
         logEvent.setAppID("UNIT-TEST");
         logEvent.setHost("localhost");
         logEvent.setEnv("test");
-        logEvent.setLevel(Level.INFO.getName());
+        logEvent.setLevel(org.slf4j.event.Level.INFO);
         logEvent.setMsg("This is auto generated log message number " + id);
         logEvent.setTimestamp(new Date());
         return logEvent;

@@ -6,6 +6,7 @@ import dk.dbc.kafka.logformat.LogEvent;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.slf4j.event.Level;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Consumer {
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ").create();
     private Date start, end;
     private String appID, host, env;
+    private Level loglevel;
 
     public void setRelevantPeriod(Date start, Date end) {
         this.start = start;
@@ -87,6 +89,10 @@ public class Consumer {
                     relevant = false;
                 }
 
+                if (this.loglevel != null && logEvent.getLevel().toInt() < this.loglevel.toInt()){ // 0, 10, 20, 30, 40
+                    relevant = false;
+                }
+
                 if (relevant) {
                     System.out.println(logEvent);
                     output.add(logEvent);
@@ -131,5 +137,13 @@ public class Consumer {
 
     public void setEnv(String env) {
         this.env = env;
+    }
+
+    public Level getLoglevel() {
+        return loglevel;
+    }
+
+    public void setLogLevel(Level logLevel) {
+        this.loglevel = logLevel;
     }
 }

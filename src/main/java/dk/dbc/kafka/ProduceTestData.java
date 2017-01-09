@@ -11,6 +11,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 
 
@@ -65,13 +66,14 @@ public class ProduceTestData {
 
     private static LogEvent createDummyObject(int id){
         LogEvent logEvent = new LogEvent();
-        int rand = (int) (Math.random()*4);
-        logEvent.setAppID(appid_examples[rand]);
-        logEvent.setHost(hostname_examples[rand]);
-        logEvent.setEnv(environment[rand]);
-        logEvent.setLevel(Level.INFO.getName());
+        logEvent.setAppID(appid_examples[ThreadLocalRandom.current().nextInt(0, 4)]);
+        logEvent.setHost(hostname_examples[ThreadLocalRandom.current().nextInt(0, 4)]);
+        logEvent.setEnv(environment[ThreadLocalRandom.current().nextInt(0, 4)]);
+        logEvent.setLevel(10* ThreadLocalRandom.current().nextInt(0, 5));
         logEvent.setMsg("This is an auto generated log message. Its number " + id);
         logEvent.setTimestamp(new Date());
         return logEvent;
     }
+
+
 }

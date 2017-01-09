@@ -3,6 +3,7 @@ package dk.dbc.kafka;
 
 import dk.dbc.kafka.logformat.LogEvent;
 import org.apache.commons.cli.CommandLine;
+import org.slf4j.event.Level;
 
 
 import java.text.SimpleDateFormat;
@@ -58,14 +59,25 @@ public class LogTracerApp
                 // relevant env,host or app-id
                 if(cmdLine.hasOption("data-env")){
                   consumer.setEnv(((String) cmdLine.getParsedOptionValue("data-env")));
+                    LOGGER.info("Filtering on environment " + consumer.getEnv());
+
                 }
 
                 if(cmdLine.hasOption("data-host")){
                     consumer.setHost((String) cmdLine.getParsedOptionValue("data-host"));
+                    LOGGER.info("Filtering on host " + consumer.getHost());
+
                 }
 
                 if(cmdLine.hasOption("data-appid")){
-                    consumer.setHost((String) cmdLine.getParsedOptionValue("data-appid"));
+                    consumer.setAppID((String) cmdLine.getParsedOptionValue("data-appid"));
+                    LOGGER.info("Filtering on app-id " + consumer.getAppID());
+
+                }
+                if(cmdLine.hasOption("data-loglevel")){
+                    Level lvl = Level.valueOf((String) cmdLine.getParsedOptionValue("data-loglevel"));
+                    consumer.setLogLevel(lvl);
+                    LOGGER.info("Filtering on log level " + lvl.toString() + " or above");
                 }
 
                 if (cmdLine.hasOption("generate-test-events")){
