@@ -23,14 +23,14 @@ public class LogTracerApp {
     public static void main(String[] args) {
         try {
             runWith(args);
-        } catch (ParseException | RuntimeException e) {
+        } catch (ParseException | org.apache.commons.cli.ParseException | RuntimeException e) {
             e.printStackTrace();
             System.exit(-1);
         }
         System.exit(0);
     }
 
-    static void runWith(String[] args) throws ParseException {
+    static void runWith(String[] args) throws ParseException, org.apache.commons.cli.ParseException {
         LOGGER.info("Log tracer has been started");
 
         Cli cliParser = null;
@@ -38,15 +38,8 @@ public class LogTracerApp {
         try {
             cliParser = new Cli(args);
             cmdLine = cliParser.parse();
-        } catch (ParseException | RuntimeException e) {
-            if (cliParser != null) {
-                cliParser.showHelp();
-            }
-            throw e;
-        }
-        if(cmdLine != null) {
-            Consumer consumer = new Consumer();
-            try {
+            if(cmdLine != null) {
+                Consumer consumer = new Consumer();
                 String hostname = cmdLine.hasOption("hostname") ? ((String) cmdLine.getParsedOptionValue("hostname")) : "localhost";
                 String port = cmdLine.hasOption("port") ? ((Number) cmdLine.getParsedOptionValue("port")).toString() : "2081";
                 String topic = cmdLine.hasOption("topic") ? ((String) cmdLine.getParsedOptionValue("topic")) : "test";
@@ -65,7 +58,7 @@ public class LogTracerApp {
 
                 // relevant env,host or app-id
                 if(cmdLine.hasOption("data-env")){
-                  consumer.setEnv(((String) cmdLine.getParsedOptionValue("data-env")));
+                    consumer.setEnv(((String) cmdLine.getParsedOptionValue("data-env")));
                     LOGGER.info("Filtering on environment " + consumer.getEnv());
 
                 }
@@ -94,10 +87,12 @@ public class LogTracerApp {
                 }else {
                     List<LogEvent> x = consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                LOGGER.severe("Log Tracer could not retrieve records from Kafka topic.");
             }
+        } catch (ParseException | org.apache.commons.cli.ParseException | RuntimeException e) {
+            if (cliParser != null) {
+                cliParser.showHelp();
+            }
+            throw e;
         }
     }
 }

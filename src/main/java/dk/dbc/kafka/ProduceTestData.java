@@ -12,7 +12,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Level;
 
 
 public class ProduceTestData {
@@ -27,9 +26,8 @@ public class ProduceTestData {
      * @param hostname kafkahost
      * @param port kafkaport
      * @param topicName name of the topic
-     * @throws Exception
      */
-    public void produceTestData(String hostname, String port, String topicName )throws Exception {
+    public void produceTestData(String hostname, String port, String topicName ) {
 
 
         //Configure the ProduceTestData
