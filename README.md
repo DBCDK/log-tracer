@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/DBCDK/log-tracer.svg?branch=master)](https://travis-ci.org/DBCDK/log-tracer)
 # log-tracer
-Log-tracer will be a commandline-tool for developers who wants to extract logs from one or more container, application or node for a given period, log-level, specific application. A prerequisite is that all applications logs in a unified format and at the lowest log-level possible (without decreasing performance significantly) and forwards to a [Apache Kafka](https://kafka.apache.org/) topic. The upside is the user a typical dev ops person
+Log-tracer is a commandline-tool for developers who wants to extract logs from one or more containers, applications or nodes for a given period, log-level, specific application. A prerequisite is that all applications log in a unified format and at the lowest log-level possible (without decreasing performance significantly) and forwards to an [Apache Kafka](https://kafka.apache.org/) topic. The upside is that the user - a typical devops person -
 * can compare and monitor logs without having to open a ssh tunnel to every relevant container or host.
 * can extract logs retroactive in a different level than the default. (Think about it. Bug shows up in production. Retrieve all logs from relevant containers at i.e. debug level)
 * manage for how long the log messages should be stored via Kafkas retention hours
@@ -53,7 +53,7 @@ usage: Log Tracer
 
 
 # Generate test data
-If you need to verify your setup you might need to generate some test data and send to a kafka topic. Log-tracer has a built in command for that called --generate-test-events. A random log event is simulated to be from one of four environments; "dev", "test", "stage", "prod". 
+If you need to verify your setup you might need to generate some test data and send it to a kafka topic. Log-tracer has a built in command for that called --generate-test-events. A random log event is simulated to be from one of four environments; "dev", "test", "stage", "prod". 
 The hostname of the log event can be one of these "mesos-node-1", "mesos-node-2", "mesos-node-3", "oldfaithfull". Finally the application id can be "smooth-sink", "wild-webapp", "terrific-transformer", "dashing-database. 
 
 ```bash
