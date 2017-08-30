@@ -284,7 +284,7 @@ public class LogTracerConsumerTest {
 
 
     @Test
-    public void testLogTracer(){
+    public void testLogTracer() throws ParseException {
         KafkaProducer<Integer, byte[]> producer = new KafkaProducer<>(producerProps);
 
         // send pre-formatted messages
@@ -314,7 +314,7 @@ public class LogTracerConsumerTest {
 
 
     @Test
-    public void testFileOutput(){
+    public void testFileOutput() throws ParseException {
 
         String[] args = new String[4];
         args[0] = "--hostname=" + BROKERHOST;
@@ -327,7 +327,7 @@ public class LogTracerConsumerTest {
     }
 
     @Test
-    public void testEmptyTopicLogTracer(){
+    public void testEmptyTopicLogTracer() throws ParseException {
         String[] args = new String[3];
         args[0] = "--hostname=" + BROKERHOST;
         args[1] = "--port=" + BROKERPORT;
@@ -336,7 +336,7 @@ public class LogTracerConsumerTest {
     }
 
     @Test
-    public void testNoHostnameLogTracer(){
+    public void testNoHostnameLogTracer() throws ParseException {
         String[] args = new String[3];
         args[0] = "--port=" + BROKERPORT;
         args[1] = "--topic=" + "not_a_topic";
