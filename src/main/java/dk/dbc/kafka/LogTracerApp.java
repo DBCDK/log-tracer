@@ -5,7 +5,7 @@ import dk.dbc.kafka.logformat.LogEvent;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.event.Level;
 
-
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,14 +15,22 @@ import java.util.logging.Logger;
 /**
  * Log tracer
  */
-public class LogTracerApp
-{
+public class LogTracerApp {
     private static Logger LOGGER = Logger.getLogger("LogTracerApp");
     private static String pattern = "yyyy-MM-dd'T'HH:mm";
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
+        try {
+            runWith(args);
+        } catch (ParseException | RuntimeException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        System.exit(0);
+    }
+
+    static void runWith(String[] args) throws ParseException {
         LOGGER.info("Log tracer has been started");
 
         Cli cliParser = null;
@@ -30,12 +38,11 @@ public class LogTracerApp
         try {
             cliParser = new Cli(args);
             cmdLine = cliParser.parse();
-        }catch (Exception e){
-            e.printStackTrace();
+        } catch (ParseException | RuntimeException e) {
             if (cliParser != null) {
                 cliParser.showHelp();
-              //  System.exit(0);
             }
+            throw e;
         }
         if(cmdLine != null) {
             Consumer consumer = new Consumer();
