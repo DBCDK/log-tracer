@@ -28,9 +28,6 @@ public class ProduceTestData {
      * @param topicName name of the topic
      */
     public void produceTestData(String hostname, String port, String topicName ) {
-
-
-        //Configure the ProduceTestData
         Properties configProperties = new Properties();
         configProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, hostname + ":" + port);
         configProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.ByteArraySerializer");
@@ -38,27 +35,28 @@ public class ProduceTestData {
 
         org.apache.kafka.clients.producer.Producer producer = new KafkaProducer(configProperties);
 
-        Thread thread = new Thread(){
-            public void run(){
-
-                while(true) {
-                    try {
-                        LogEvent logEvent = createDummyObject(counter++);
-                        ProducerRecord<String, String> rec = new ProducerRecord<String, String>(topicName,logEvent.toJSON());
-                        System.out.println("Generating log event. " + logEvent.toJSON());
-                        producer.send(rec);
-                        sleep(500);
-                    } catch (InterruptedException e) {
-                        producer.close();
-                        System.out.println("### Generated " + counter + " message(s)");
-                        e.printStackTrace();
-                    }
+        final Thread thread = new Thread(() -> {
+            while(true) {
+                try {
+                    LogEvent logEvent = createDummyObject(counter++);
+                    ProducerRecord<String, String> rec = new ProducerRecord<>(topicName, logEvent.toJSON());
+                    System.out.println("Generating log event. " + logEvent.toJSON());
+                    producer.send(rec);
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    producer.close();
+                    System.out.println("### Generated " + counter + " message(s)");
+                    e.printStackTrace();
                 }
             }
-        };
+        });
 
         thread.start();
-
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
