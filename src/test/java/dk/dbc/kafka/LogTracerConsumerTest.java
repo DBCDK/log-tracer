@@ -40,7 +40,6 @@ import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-
 /**
  * File created by andreas on 12/12/16 heavily inspired by the work done by https://github.com/asmaier/mini-kafka/
  * For online documentation see
@@ -162,6 +161,7 @@ public class LogTracerConsumerTest {
         }
         assertTrue(output.size()==5);
     }
+
     @Test
     public void testConsumeLogEventsFromNonExistingAppID(){
         sendTestLogEventsFromFile();
