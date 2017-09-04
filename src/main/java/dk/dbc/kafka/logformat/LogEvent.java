@@ -1,53 +1,36 @@
 package dk.dbc.kafka.logformat;
 
-import kafka.utils.Time;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.event.Level;
 
-/**
- * Created by andreas on 12/22/16.
- */
+import java.time.OffsetDateTime;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LogEvent {
-    private transient SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ"); // "2017-01-22T15:22:57.567824034+02:00",
-    private Time kafkaTimestamp;
-    private Date timestamp;
+    private OffsetDateTime timestamp;
     private String host;
+    @JsonProperty("sys_env")
     private String env;
+    @JsonProperty("sys_team")
+    private String team;
+    @JsonProperty("sys_appid")
     private String appID;
-    private Level level; // ERROR int=40, WARN int=30, INFO int=20, DEBUG int=10, TRACE int=0
-    private  String msg;
+    @JsonProperty("sys_taskid")
+    private String taskId;
+    @JsonProperty("sys_type")
+    private String type;
+    @JsonProperty("sys_json")
+    private Boolean json;
 
-    public boolean isInRelevantPeriod(Date start, Date end){
-        return ( start.before(timestamp) && end.after(timestamp));
-    }
+    private Level level;
+    private  String message;
 
-    public boolean isRelevantAppID(String relevantAppID){
-        return relevantAppID.equalsIgnoreCase(this.appID);
-    }
-
-    public boolean isRelevantHost(String relevantHost){
-        return relevantHost.equalsIgnoreCase(this.host);
-    }
-    public boolean isRelevantEnvironment(String relevantEnv){
-        return relevantEnv.equalsIgnoreCase(this.env);
-    }
-
-
-    public Time getKafkaTimestamp() {
-        return kafkaTimestamp;
-    }
-
-    public void setKafkaTimestamp(Time kafkaTimestamp) {
-        this.kafkaTimestamp = kafkaTimestamp;
-    }
-
-    public Date getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -75,25 +58,12 @@ public class LogEvent {
         this.level = level;
     }
 
-    /**
-     * Set the level from an int. ERROR int=40, WARN int=30, INFO int=20, DEBUG int=10, TRACE int=0
-     * @param level 0,10,20,30,40
-     */
-    public void setLevel(int level){
-        for (Level c : org.slf4j.event.Level.values()){
-            if(c.toInt()== level){
-                this.level = c;
-            }
-        }
+    public String getMessage() {
+        return message;
     }
 
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getEnv() {
@@ -104,19 +74,107 @@ public class LogEvent {
         this.env = env;
     }
 
-    public String toJSON(){ // {"timestamp":"2017-01-12T08:00:00.000000000+02:00","host":"my-node","appID":"superapp","level":"WARN","env":"dev","msg":"the log message"}
-        return "{\"timestamp\":\"" + sdf.format(timestamp) + "\",\"host\":\"" + host + "\",\"appID\":\"" + appID +"\",\"level\":\"" +level +"\",\"env\":\""+ env + "\",\"msg\":\""+msg + "\"}";
+    public String getTeam() {
+        return team;
+    }
+
+    public void setTeam(String team) {
+        this.team = team;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Boolean isJson() {
+        return json == null ? false : json;
+    }
+
+    public void setJson(Boolean json) {
+        this.json = json;
     }
 
     @Override
     public String toString() {
         return "LogEvent{" +
-                "timestamp=" + sdf.format(timestamp) +
+                "timestamp=" + timestamp +
                 ", host='" + host + '\'' +
                 ", env='" + env + '\'' +
+                ", team='" + team + '\'' +
                 ", appID='" + appID + '\'' +
-                ", level='" + level.name() + '\'' +
-                ", msg='" + msg + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", type='" + type + '\'' +
+                ", json=" + json +
+                ", level=" + level +
+                ", message='" + message + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LogEvent logEvent = (LogEvent) o;
+
+        if (timestamp != null ? !timestamp.equals(logEvent.timestamp) : logEvent.timestamp != null) {
+            return false;
+        }
+        if (host != null ? !host.equals(logEvent.host) : logEvent.host != null) {
+            return false;
+        }
+        if (env != null ? !env.equals(logEvent.env) : logEvent.env != null) {
+            return false;
+        }
+        if (team != null ? !team.equals(logEvent.team) : logEvent.team != null) {
+            return false;
+        }
+        if (appID != null ? !appID.equals(logEvent.appID) : logEvent.appID != null) {
+            return false;
+        }
+        if (taskId != null ? !taskId.equals(logEvent.taskId) : logEvent.taskId != null) {
+            return false;
+        }
+        if (type != null ? !type.equals(logEvent.type) : logEvent.type != null) {
+            return false;
+        }
+        if (json != null ? !json.equals(logEvent.json) : logEvent.json != null) {
+            return false;
+        }
+        if (level != logEvent.level) {
+            return false;
+        }
+        return message != null ? message.equals(logEvent.message) : logEvent.message == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = timestamp != null ? timestamp.hashCode() : 0;
+        result = 31 * result + (host != null ? host.hashCode() : 0);
+        result = 31 * result + (env != null ? env.hashCode() : 0);
+        result = 31 * result + (team != null ? team.hashCode() : 0);
+        result = 31 * result + (appID != null ? appID.hashCode() : 0);
+        result = 31 * result + (taskId != null ? taskId.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (json != null ? json.hashCode() : 0);
+        result = 31 * result + (level != null ? level.hashCode() : 0);
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        return result;
     }
 }

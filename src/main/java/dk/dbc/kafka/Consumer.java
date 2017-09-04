@@ -1,14 +1,15 @@
 package dk.dbc.kafka;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dk.dbc.kafka.logformat.LogEvent;
+import dk.dbc.kafka.logformat.LogEventMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.event.Level;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UncheckedIOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -21,18 +22,17 @@ import java.util.logging.Logger;
  * Created by andreas on 12/8/16. Inspired by javaworld 'Big data messaging with Kafka, Part 1'
  */
 public class Consumer {
+    private static final Logger LOGGER = Logger.getLogger("Consumer");
 
-    private static Logger LOGGER = Logger.getLogger("Consumer");
-    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ").create();
-    private Date start, end;
+    private final LogEventMapper logEventMapper = new LogEventMapper();
+    private OffsetDateTime start, end;
     private String appID, host, env;
     private Level loglevel;
 
     public void setRelevantPeriod(Date start, Date end) {
-        this.start = start;
-        this.end = end;
+        this.start = OffsetDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault());
+        this.end = OffsetDateTime.ofInstant(end.toInstant(), ZoneId.systemDefault());
     }
-
 
     /**
      * Consume kafka topics
@@ -51,7 +51,6 @@ public class Consumer {
         // setup consumer
         Properties consumerProps = createKafkaConsumerProperties(hostname, port, groupId, offset, clientID);
 
-
         KafkaConsumer<Integer, byte[]> consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Arrays.asList(topicName));
         List<LogEvent> output = new ArrayList<LogEvent>();
@@ -69,11 +68,16 @@ public class Consumer {
 
             while (recordIterator.hasNext()) {
                 ConsumerRecord<Integer, byte[]> record = recordIterator.next();
-                logEvent = gson.fromJson(new String(record.value(), StandardCharsets.UTF_8), LogEvent.class);
+                try {
+                    logEvent = logEventMapper.unmarshall(record.value());
+                } catch (UncheckedIOException e) {
+                    System.out.println(e.toString());
+                    continue;
+                }
                 relevant = true;
 
                 //  filter events!
-                if ((this.start != null && logEvent.getTimestamp().before(this.start)) || (this.end != null && logEvent.getTimestamp().after(this.end))) {
+                if ((this.start != null && logEvent.getTimestamp().isBefore(this.start)) || (this.end != null && logEvent.getTimestamp().isAfter(this.end))) {
                     relevant = false;
                 }
 

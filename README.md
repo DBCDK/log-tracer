@@ -60,15 +60,15 @@ The hostname of the log event can be one of these "mesos-node-1", "mesos-node-2"
 < first start the random producer >
 $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --generate-test-events --hostname localhost --port 9092 --topic testtopic
 
-Generating log event. {"timestamp":"2017-01-06T16:54:47.000000079+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","msg":"This is an auto generated log message. Its number 1258"}
-Generating log event. {"timestamp":"2017-01-06T16:54:47.000000579+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","msg":"This is an auto generated log message. Its number 1259"}
-Generating log event. {"timestamp":"2017-01-06T16:54:48.000000080+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","msg":"This is an auto generated log message. Its number 1260"}
-Generating log event. {"timestamp":"2017-01-06T16:54:48.000000580+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","msg":"This is an auto generated log message. Its number 1261"}
-Generating log event. {"timestamp":"2017-01-06T16:54:49.000000081+0100","host":"mesos-node-2","appID":"wild-webapp","level":"INFO","env":"test","msg":"This is an auto generated log message. Its number 1262"}
-Generating log event. {"timestamp":"2017-01-06T16:54:49.000000581+0100","host":"mesos-node-2","appID":"wild-webapp","level":"INFO","env":"test","msg":"This is an auto generated log message. Its number 1263"}
-Generating log event. {"timestamp":"2017-01-06T16:54:50.000000081+0100","host":"oldfaithfull","appID":"dashing-database","level":"INFO","env":"prod","msg":"This is an auto generated log message. Its number 1264"}
-Generating log event. {"timestamp":"2017-01-06T16:54:50.000000581+0100","host":"oldfaithfull","appID":"dashing-database","level":"INFO","env":"prod","msg":"This is an auto generated log message. Its number 1265"}
-Generating log event. {"timestamp":"2017-01-06T16:54:51.000000082+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","msg":"This is an auto generated log message. Its number 1266"}
+Generating log event. {"timestamp":"2017-01-06T16:54:47.000000079+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","message":"This is an auto generated log message. Its number 1258"}
+Generating log event. {"timestamp":"2017-01-06T16:54:47.000000579+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","message":"This is an auto generated log message. Its number 1259"}
+Generating log event. {"timestamp":"2017-01-06T16:54:48.000000080+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","message":"This is an auto generated log message. Its number 1260"}
+Generating log event. {"timestamp":"2017-01-06T16:54:48.000000580+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","message":"This is an auto generated log message. Its number 1261"}
+Generating log event. {"timestamp":"2017-01-06T16:54:49.000000081+0100","host":"mesos-node-2","appID":"wild-webapp","level":"INFO","env":"test","message":"This is an auto generated log message. Its number 1262"}
+Generating log event. {"timestamp":"2017-01-06T16:54:49.000000581+0100","host":"mesos-node-2","appID":"wild-webapp","level":"INFO","env":"test","message":"This is an auto generated log message. Its number 1263"}
+Generating log event. {"timestamp":"2017-01-06T16:54:50.000000081+0100","host":"oldfaithfull","appID":"dashing-database","level":"INFO","env":"prod","message":"This is an auto generated log message. Its number 1264"}
+Generating log event. {"timestamp":"2017-01-06T16:54:50.000000581+0100","host":"oldfaithfull","appID":"dashing-database","level":"INFO","env":"prod","message":"This is an auto generated log message. Its number 1265"}
+Generating log event. {"timestamp":"2017-01-06T16:54:51.000000082+0100","host":"mesos-node-3","appID":"terrific-transformer","level":"INFO","env":"stage","message":"This is an auto generated log message. Its number 1266"}
  
 
 < Open a new terminal and start consuming >
@@ -98,6 +98,6 @@ $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname 
 
 # Log format
 The required  JSON message format for all log-events
-`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","hostname":"mesos-node-7","app":"any-application-with-modern-logging","level":"DEBUG","env":"prod","msg":"the log message"}`
+`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","hostname":"mesos-node-7","app":"any-application-with-modern-logging","level":"DEBUG","env":"prod","message":"the log message"}`
 
 With no linebreaks.
