@@ -1,5 +1,27 @@
 package dk.dbc.kafka;
 
+import dk.dbc.kafka.logformat.LogEvent;
+import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
+import kafka.server.KafkaConfig;
+import kafka.server.KafkaServer;
+import kafka.utils.SystemTime$;
+import kafka.utils.TestUtils;
+import kafka.utils.ZKStringSerializer$;
+import kafka.utils.ZkUtils;
+import kafka.zk.EmbeddedZookeeper;
+import org.I0Itec.zkclient.ZkClient;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,26 +37,8 @@ import java.util.Scanner;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import dk.dbc.kafka.logformat.LogEvent;
-import kafka.utils.SystemTime$;
-import org.I0Itec.zkclient.ZkClient;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.*;
-import static org.junit.Assert.*;
-
-import kafka.admin.AdminUtils;
-import kafka.admin.RackAwareMode;
-import kafka.server.KafkaConfig;
-import kafka.server.KafkaServer;
-import kafka.utils.TestUtils;
-import kafka.utils.ZKStringSerializer$;
-import kafka.utils.ZkUtils;
-import kafka.zk.EmbeddedZookeeper;
-import org.junit.runners.MethodSorters;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -280,7 +284,7 @@ public class LogTracerConsumerTest {
 
 
     @Test
-    public void testLogTracer(){
+    public void testLogTracer() throws ParseException, org.apache.commons.cli.ParseException {
         KafkaProducer<Integer, byte[]> producer = new KafkaProducer<>(producerProps);
 
         // send pre-formatted messages
@@ -305,12 +309,12 @@ public class LogTracerConsumerTest {
         args[0] = "--hostname=" + BROKERHOST;
         args[1] = "--port=" + BROKERPORT;
         args[2] = "--topic=" + TOPIC_JSON + "xx";
-        LogTracerApp.main(args);
+        LogTracerApp.runWith(args);
     }
 
 
     @Test
-    public void testFileOutput(){
+    public void testFileOutput() throws ParseException, org.apache.commons.cli.ParseException {
 
         String[] args = new String[4];
         args[0] = "--hostname=" + BROKERHOST;
@@ -318,25 +322,25 @@ public class LogTracerConsumerTest {
         args[2] = "--topic=" + TOPIC_JSON;
         args[3] = "--store=" + "fileoutput.json";
 
-        LogTracerApp.main(args);
+        LogTracerApp.runWith(args);
 
     }
 
     @Test
-    public void testEmptyTopicLogTracer(){
+    public void testEmptyTopicLogTracer() throws ParseException, org.apache.commons.cli.ParseException {
         String[] args = new String[3];
         args[0] = "--hostname=" + BROKERHOST;
         args[1] = "--port=" + BROKERPORT;
         args[2] = "--topic=" + "not_a_topic";
-        LogTracerApp.main(args);
+        LogTracerApp.runWith(args);
     }
 
     @Test
-    public void testNoHostnameLogTracer(){
+    public void testNoHostnameLogTracer() throws ParseException, org.apache.commons.cli.ParseException {
         String[] args = new String[3];
         args[0] = "--port=" + BROKERPORT;
         args[1] = "--topic=" + "not_a_topic";
-        LogTracerApp.main(args);
+        LogTracerApp.runWith(args);
     }
 
 

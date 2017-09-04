@@ -5,7 +5,7 @@ import dk.dbc.kafka.logformat.LogEvent;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.event.Level;
 
-
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,14 +15,22 @@ import java.util.logging.Logger;
 /**
  * Log tracer
  */
-public class LogTracerApp
-{
+public class LogTracerApp {
     private static Logger LOGGER = Logger.getLogger("LogTracerApp");
     private static String pattern = "yyyy-MM-dd'T'HH:mm";
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
+        try {
+            runWith(args);
+        } catch (ParseException | org.apache.commons.cli.ParseException | RuntimeException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        System.exit(0);
+    }
+
+    static void runWith(String[] args) throws ParseException, org.apache.commons.cli.ParseException {
         LOGGER.info("Log tracer has been started");
 
         Cli cliParser = null;
@@ -30,16 +38,8 @@ public class LogTracerApp
         try {
             cliParser = new Cli(args);
             cmdLine = cliParser.parse();
-        }catch (Exception e){
-            e.printStackTrace();
-            if (cliParser != null) {
-                cliParser.showHelp();
-              //  System.exit(0);
-            }
-        }
-        if(cmdLine != null) {
-            Consumer consumer = new Consumer();
-            try {
+            if(cmdLine != null) {
+                Consumer consumer = new Consumer();
                 String hostname = cmdLine.hasOption("hostname") ? ((String) cmdLine.getParsedOptionValue("hostname")) : "localhost";
                 String port = cmdLine.hasOption("port") ? ((Number) cmdLine.getParsedOptionValue("port")).toString() : "2081";
                 String topic = cmdLine.hasOption("topic") ? ((String) cmdLine.getParsedOptionValue("topic")) : "test";
@@ -58,7 +58,7 @@ public class LogTracerApp
 
                 // relevant env,host or app-id
                 if(cmdLine.hasOption("data-env")){
-                  consumer.setEnv(((String) cmdLine.getParsedOptionValue("data-env")));
+                    consumer.setEnv(((String) cmdLine.getParsedOptionValue("data-env")));
                     LOGGER.info("Filtering on environment " + consumer.getEnv());
 
                 }
@@ -87,10 +87,12 @@ public class LogTracerApp
                 }else {
                     List<LogEvent> x = consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID, 0);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                LOGGER.severe("Log Tracer could not retrieve records from Kafka topic.");
             }
+        } catch (ParseException | org.apache.commons.cli.ParseException | RuntimeException e) {
+            if (cliParser != null) {
+                cliParser.showHelp();
+            }
+            throw e;
         }
     }
 }
