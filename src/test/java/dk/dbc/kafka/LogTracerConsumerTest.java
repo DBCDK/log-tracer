@@ -1,6 +1,7 @@
 package dk.dbc.kafka;
 
 import dk.dbc.kafka.logformat.LogEvent;
+import dk.dbc.kafka.logformat.LogEventFilter;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
 import kafka.server.KafkaConfig;
@@ -29,7 +30,6 @@ import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -118,11 +118,10 @@ public class LogTracerConsumerTest {
 
     @Test
     public void testConsumerAllRecords(){
-
         sendTestLogEventsFromFile();
 
         Consumer consumer = new Consumer();
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", new LogEventFilter());
         LOGGER.info("Prod Log events = (" + output.size() + ")");
 
         for (LogEvent event : output) {
@@ -135,10 +134,11 @@ public class LogTracerConsumerTest {
     public void testConsumeProdLogEventsFromSpecificHost(){
         sendTestLogEventsFromFile();
 
+        final LogEventFilter logEventFilter = new LogEventFilter()
+                .setEnv("prod")
+                .setHost("mesos-node-7");
         Consumer consumer = new Consumer();
-        consumer.setEnv("prod");
-        consumer.setHost("mesos-node-7");
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", logEventFilter);
         LOGGER.info("Prod Log events = (" + output.size() + ")");
 
         for (LogEvent event : output) {
@@ -151,9 +151,10 @@ public class LogTracerConsumerTest {
     public void testConsumeLogEventsFromAppID(){
         sendTestLogEventsFromFile();
 
+        final LogEventFilter logEventFilter = new LogEventFilter()
+                .setAppID("superapp");
         Consumer consumer = new Consumer();
-        consumer.setAppID("superapp");
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", logEventFilter);
         LOGGER.info("Prod Log events = (" + output.size() + ")");
 
         for (LogEvent event : output) {
@@ -166,9 +167,10 @@ public class LogTracerConsumerTest {
     public void testConsumeLogEventsFromNonExistingAppID(){
         sendTestLogEventsFromFile();
 
+        final LogEventFilter logEventFilter = new LogEventFilter()
+                .setAppID("None existing app");
         Consumer consumer = new Consumer();
-        consumer.setAppID("None existing app");
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", logEventFilter);
         assertTrue(output.size()==0);
     }
 
@@ -176,9 +178,10 @@ public class LogTracerConsumerTest {
     public void testConsumeLogEventsFromSpecificHost(){
         sendTestLogEventsFromFile();
 
+        final LogEventFilter logEventFilter = new LogEventFilter()
+                .setHost("mesos-node-7");
         Consumer consumer = new Consumer();
-        consumer.setHost("mesos-node-7");
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", logEventFilter);
         LOGGER.info("ConsumeLogEventsFromSpecificHost = (" + output.size() + ")");
 
         for (LogEvent event : output) {
@@ -191,9 +194,10 @@ public class LogTracerConsumerTest {
     public void testConsumeProdLogEvents(){
         sendTestLogEventsFromFile();
 
+        final LogEventFilter logEventFilter = new LogEventFilter()
+                .setEnv("prod");
         Consumer consumer = new Consumer();
-        consumer.setEnv("prod");
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", logEventFilter);
         LOGGER.info("Prod Log events = (" + output.size() + ")");
 
         for (LogEvent event : output) {
@@ -221,17 +225,13 @@ public class LogTracerConsumerTest {
     }*/
 
     @Test
-    public void testConsumeRelevantTimePeriodLogEvents() {
+    public void testConsumeRelevantTimePeriodLogEvents() throws ParseException {
         sendTestLogEventsFromFile();
+        final LogEventFilter logEventFilter = new LogEventFilter()
+                .setFrom(simpleDateFormat.parse("2017-01-06T00:00"))
+                .setUntil(simpleDateFormat.parse("2017-01-08T23:59"));
         Consumer consumer = new Consumer();
-        try {
-            Date start = simpleDateFormat.parse("2017-01-06T00:00");
-            Date end = simpleDateFormat.parse("2017-01-08T23:59");
-            consumer.setRelevantPeriod(start, end);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", logEventFilter);
         LOGGER.info("testConsumeRelevantTimePeriodLogEvents Relevant logevents= (" + output.size() + ")");
 
         for (LogEvent event : output) {
@@ -240,40 +240,14 @@ public class LogTracerConsumerTest {
         assertTrue(output.size() == 3);
     }
 
-
     @Test
-    public void testConsumeRelevantTimePeriodeLogEvents() {
+    public void testConsumeRelevantTimePeriodeLogEventsNoHits() throws ParseException {
         sendTestLogEventsFromFile();
+        final LogEventFilter logEventFilter = new LogEventFilter()
+                .setFrom(simpleDateFormat.parse("2016-01-01T00:00"))
+                .setUntil(simpleDateFormat.parse("2016-01-08T23:59"));
         Consumer consumer = new Consumer();
-        try {
-            Date start = simpleDateFormat.parse("2017-01-16T00:00");
-            Date end = simpleDateFormat.parse("2017-01-25T00:00");
-            consumer.setRelevantPeriod(start, end);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
-        LOGGER.info("testConsumeRelevantTimePeriodLogEvents Relevant logevents= (" + output.size() + ")");
-
-        for (LogEvent event : output) {
-            LOGGER.info("event = " + event);
-        }
-        assertTrue(output.size() == 4);
-    }
-
-
-    @Test
-    public void testConsumeRelevantTimePeriodeLogEventsNoHits() {
-        sendTestLogEventsFromFile();
-        Consumer consumer = new Consumer();
-        try {
-            Date start = simpleDateFormat.parse("2016-01-01T00:00");
-            Date end = simpleDateFormat.parse("2016-01-08T23:59");
-            consumer.setRelevantPeriod(start, end);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", 0);
+        List<LogEvent> output = consumer.readLogEventsFromTopic(BROKERHOST, BROKERPORT, "logevents", UUID.randomUUID().toString(), "earliest", "new-test", logEventFilter);
         LOGGER.info("testConsumeRelevantTimePeriodLogEvents Relevant logevents= (" + output.size() + ")");
 
         for (LogEvent event : output) {
@@ -281,7 +255,6 @@ public class LogTracerConsumerTest {
         }
         assertTrue(output.size() == 0);
     }
-
 
     @Test
     public void testLogTracer() throws ParseException, org.apache.commons.cli.ParseException {
