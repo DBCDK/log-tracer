@@ -51,14 +51,12 @@ public class LogEventFilter implements Predicate<LogEvent> {
     public boolean test(LogEvent logEvent) {
         boolean allowed = true;
 
-        if (logEvent.getTimestamp() != null) {
-            if (from != null && logEvent.getTimestamp().isBefore(from)) {
-                allowed = false;
-            }
+        if (from != null && (logEvent.getTimestamp() == null || logEvent.getTimestamp().isBefore(from))) {
+            allowed = false;
+        }
 
-            if (until != null && logEvent.getTimestamp().isAfter(until)) {
-                allowed = false;
-            }
+        if (until != null && (logEvent.getTimestamp() == null || logEvent.getTimestamp().isAfter(until))) {
+            allowed = false;
         }
 
         if (appID != null && !appID.isEmpty() && !appID.equalsIgnoreCase(logEvent.getAppID())) {
@@ -73,7 +71,7 @@ public class LogEventFilter implements Predicate<LogEvent> {
             allowed = false;
         }
 
-        if (loglevel != null && logEvent.getLevel() != null && logEvent.getLevel().toInt() < loglevel.toInt()) {
+        if (loglevel != null && (logEvent.getLevel() == null || logEvent.getLevel().toInt() < loglevel.toInt())) {
             allowed = false;
         }
 
