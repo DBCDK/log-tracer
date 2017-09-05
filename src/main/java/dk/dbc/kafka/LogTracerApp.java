@@ -3,6 +3,7 @@ package dk.dbc.kafka;
 
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventFilter;
+import dk.dbc.kafka.logformat.LogEventSimpleFormatter;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.event.Level;
 
@@ -85,7 +86,7 @@ public class LogTracerApp {
 
                     for (final LogEvent logEvent : consumer) {
                         if (logEvent != null && logEventFilter.test(logEvent)) {
-                            System.out.println(logEvent);
+                            System.out.println(LogEventSimpleFormatter.of(logEvent));
                         }
                     }
                 }
