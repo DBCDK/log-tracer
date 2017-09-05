@@ -1,78 +1,69 @@
 package dk.dbc.kafka;
 
 import dk.dbc.kafka.logformat.LogEvent;
-import dk.dbc.kafka.logformat.LogEventFilter;
 import dk.dbc.kafka.logformat.LogEventMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
 
-/**
- * Created by andreas on 12/8/16. Inspired by javaworld 'Big data messaging with Kafka, Part 1'
- */
-public class Consumer {
-    private static final Logger LOGGER = Logger.getLogger("Consumer");
+public class Consumer implements Iterable<LogEvent> {
+    private final Properties kafkaConsumerProperties;
+    private final String topicName;
+    private final LogEventMapper logEventMapper;
 
-    private final LogEventMapper logEventMapper = new LogEventMapper();
+    public Consumer(String hostname, String port, String topicName, String groupId, String offset, String clientID) {
+        this.topicName = topicName;
+        this.kafkaConsumerProperties = createKafkaConsumerProperties(hostname, port, groupId, offset, clientID);
+        this.logEventMapper = new LogEventMapper();
+    }
 
-    /**
-     * Consume kafka topics
-     */
-    public List<LogEvent> readLogEventsFromTopic(String hostname, String port, String topicName, String groupId,
-                                                 String offset, String clientID, LogEventFilter logEventFilter) {
-
-        // setup consumer
-        Properties consumerProps = createKafkaConsumerProperties(hostname, port, groupId, offset, clientID);
-
-        KafkaConsumer<Integer, byte[]> consumer = new KafkaConsumer<>(consumerProps);
-        consumer.subscribe(Arrays.asList(topicName));
-        List<LogEvent> output = new ArrayList<LogEvent>();
-
-        // starting consumer
-        ConsumerRecords<Integer, byte[]> records = consumer.poll(3000);
-        Iterator<ConsumerRecord<Integer, byte[]>> recordIterator = records.iterator();
-        if (records.count() == 0) {
-            LOGGER.warning("No records found in topic");
-            return output;
-        } else {
-            LOGGER.info("Topic: " + topicName + " Count: " + records.count());
-            LogEvent logEvent = null;
-
-            while (recordIterator.hasNext()) {
-                ConsumerRecord<Integer, byte[]> record = recordIterator.next();
-                try {
-                    logEvent = logEventMapper.unmarshall(record.value());
-                } catch (UncheckedIOException e) {
-                    System.out.println(e.toString());
-                    continue;
-                }
-
-                if (logEventFilter.test(logEvent)) {
-                    System.out.println(logEvent);
-                    output.add(logEvent);
-                }
+    @Override
+    public Iterator<LogEvent> iterator() {
+        return new Iterator<LogEvent>() {
+            final KafkaConsumer<Integer, byte[]> kafkaConsumer = new KafkaConsumer<>(kafkaConsumerProperties);
+            {
+                kafkaConsumer.subscribe(Collections.singletonList(topicName));
             }
-        }
+            ConsumerRecords<Integer, byte[]> records;
+            Iterator<ConsumerRecord<Integer, byte[]>> recordsIterator;
 
-        return output;
+            @Override
+            public boolean hasNext() {
+                if (recordsIterator == null || !recordsIterator.hasNext()) {
+                    records = kafkaConsumer.poll(3000);
+                    recordsIterator = records.iterator();
+                }
+                return recordsIterator.hasNext();
+            }
+
+            @Override
+            public LogEvent next() {
+                final ConsumerRecord<Integer, byte[]> record = recordsIterator.next();
+                try {
+                    return logEventMapper.unmarshall(record.value());
+                } catch (UncheckedIOException e) {
+                    System.out.println(e.toString() + " " + new String(record.value(), StandardCharsets.UTF_8));
+                }
+                return null;
+            }
+        };
     }
 
     private Properties createKafkaConsumerProperties(String hostname, String port, String groupId, String offset, String clientID) {
-        Properties consumerProps = new Properties();
+        final Properties consumerProps = new Properties();
         consumerProps.setProperty("bootstrap.servers", hostname + ":" + port);
         consumerProps.setProperty("group.id", groupId);
         consumerProps.setProperty("client.id", clientID); // UUID.randomUUID().toString()
         consumerProps.setProperty("key.deserializer", "org.apache.kafka.common.serialization.IntegerDeserializer");
         consumerProps.setProperty("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         consumerProps.put("auto.offset.reset", offset);  // The consumer can starts from the beginning of the topic or the end
+        consumerProps.put("max.poll.records", "100");
         return consumerProps;
     }
 }
