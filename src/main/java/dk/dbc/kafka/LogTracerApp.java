@@ -1,6 +1,7 @@
 package dk.dbc.kafka;
 
 
+import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventFilter;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.event.Level;
@@ -38,7 +39,6 @@ public class LogTracerApp {
             cliParser = new Cli(args);
             cmdLine = cliParser.parse();
             if(cmdLine != null) {
-                Consumer consumer = new Consumer();
                 String hostname = cmdLine.hasOption("hostname") ? ((String) cmdLine.getParsedOptionValue("hostname")) : "localhost";
                 String port = cmdLine.hasOption("port") ? ((Number) cmdLine.getParsedOptionValue("port")).toString() : "2081";
                 String topic = cmdLine.hasOption("topic") ? ((String) cmdLine.getParsedOptionValue("topic")) : "test";
@@ -80,8 +80,14 @@ public class LogTracerApp {
                     ProduceTestData generateTestLogEvents = new ProduceTestData();
                     generateTestLogEvents.produceTestData(hostname, port, topic);
                 } else {
-                    consumer.readLogEventsFromTopic(hostname, port, topic, UUID.randomUUID().toString(), offset,
-                            clientID, logEventFilter);
+                    final Consumer consumer =
+                            new Consumer(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID);
+
+                    for (final LogEvent logEvent : consumer) {
+                        if (logEvent != null && logEventFilter.test(logEvent)) {
+                            System.out.println(logEvent);
+                        }
+                    }
                 }
             }
         } catch (ParseException | org.apache.commons.cli.ParseException | RuntimeException e) {
