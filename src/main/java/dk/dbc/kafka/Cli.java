@@ -37,12 +37,6 @@ public class Cli {
                 .required(false)
                 .desc("Shows this usage message")
                 .build();
-        Option produceOption = Option.builder("g")
-                .longOpt("generate-test-events")
-                .required(false)
-                .numberOfArgs(0)
-                .desc("Generate random log events. Simulating four different environments, application ids and hostnames. ")
-                .build();
 
         Option kafkaHostname = Option.builder("h")
                 .longOpt("hostname")
@@ -147,7 +141,6 @@ public class Cli {
                 .build();
 
         options.addOption(helpOption);
-        options.addOption(produceOption);
         options.addOption(kafkaHostname);
         options.addOption(portOption);
         options.addOption(kafkaTopic);

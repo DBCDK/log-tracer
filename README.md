@@ -37,7 +37,7 @@ usage: Log Tracer
  -ds,--data-start <arg>      Relevant time period you want data from in
                              the format yyyy-MM-dd'T'HH:mm i.e.
                              2017-01-22T13:22
- -f,--follow                 Continuously follow log events
+ -f,--follow                 Continuously consume log events
  -fmt,--format <arg>         Output format {RAW, SIMPLE}                            
  -g,--generate-test-events   Generate random log events. Simulating four
                              different environments, application ids and
@@ -50,32 +50,6 @@ usage: Log Tracer
  -p,--port <arg>             Port of the kafka host
  -s,--store <arg>            Store consumed records to a file
  -t,--topic <arg>            Kafka topic you want to consume
-
-```
-
-
-# Generate test data
-If you need to verify your setup you might need to generate some test data and send it to a kafka topic. Log-tracer has a built in command for that called --generate-test-events. A random log event is simulated to be from one of four environments; "dev", "test", "stage", "prod". 
-The hostname of the log event can be one of these "mesos-node-1", "mesos-node-2", "mesos-node-3", "oldfaithfull". Finally the application id can be "smooth-sink", "wild-webapp", "terrific-transformer", "dashing-database. 
-
-```bash
-< first start the random producer >
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --generate-test-events --hostname localhost --port 9092 --topic testtopic
-
-Generating log event. {"timestamp":"2017-01-06T16:54:47.000000079+0100","host":"mesos-node-3","sys_appid":"terrific-transformer","level":"INFO","sys_env":"stage","message":"This is an auto generated log message. Its number 1258"}
-Generating log event. {"timestamp":"2017-01-06T16:54:47.000000579+0100","host":"mesos-node-3","sys_appid":"terrific-transformer","level":"INFO","sys_env":"stage","message":"This is an auto generated log message. Its number 1259"}
-Generating log event. {"timestamp":"2017-01-06T16:54:48.000000080+0100","host":"mesos-node-3","sys_appid":"terrific-transformer","level":"INFO","sys_env":"stage","message":"This is an auto generated log message. Its number 1260"}
-Generating log event. {"timestamp":"2017-01-06T16:54:48.000000580+0100","host":"mesos-node-3","sys_appid":"terrific-transformer","level":"INFO","sys_env":"stage","message":"This is an auto generated log message. Its number 1261"}
-Generating log event. {"timestamp":"2017-01-06T16:54:49.000000081+0100","host":"mesos-node-2","sys_appid":"wild-webapp","level":"INFO","sys_env":"test","message":"This is an auto generated log message. Its number 1262"}
-Generating log event. {"timestamp":"2017-01-06T16:54:49.000000581+0100","host":"mesos-node-2","sys_appid":"wild-webapp","level":"INFO","sys_env":"test","message":"This is an auto generated log message. Its number 1263"}
-Generating log event. {"timestamp":"2017-01-06T16:54:50.000000081+0100","host":"oldfaithfull","sys_appid":"dashing-database","level":"INFO","sys_env":"prod","message":"This is an auto generated log message. Its number 1264"}
-Generating log event. {"timestamp":"2017-01-06T16:54:50.000000581+0100","host":"oldfaithfull","sys_appid":"dashing-database","level":"INFO","sys_env":"prod","message":"This is an auto generated log message. Its number 1265"}
-Generating log event. {"timestamp":"2017-01-06T16:54:51.000000082+0100","host":"mesos-node-3","sys_appid":"terrific-transformer","level":"INFO","sys_env":"stage","message":"This is an auto generated log message. Its number 1266"}
- 
-
-< Open a new terminal and start consuming >
-
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --hostname localhost --port 9092 --topic testtopic
 
 ```
 

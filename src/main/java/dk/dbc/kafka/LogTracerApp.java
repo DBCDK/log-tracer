@@ -80,36 +80,31 @@ public class LogTracerApp {
                     logEventFilter.setLoglevel(Level.valueOf((String) cmdLine.getParsedOptionValue("data-loglevel")));
                 }
 
-                if (cmdLine.hasOption("generate-test-events")) {
-                    ProduceTestData generateTestLogEvents = new ProduceTestData();
-                    generateTestLogEvents.produceTestData(hostname, port, topic);
-                } else {
-                    final Consumer consumer =
-                            new Consumer(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID);
-                    final Iterator<LogEvent> iterator = consumer.iterator();
+                final Consumer consumer =
+                        new Consumer(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID);
+                final Iterator<LogEvent> iterator = consumer.iterator();
 
-                    while (true) {
-                        while (iterator.hasNext()) {
-                            final LogEvent logEvent = iterator.next();
-                            if (logEvent != null && logEventFilter.test(logEvent)) {
-                                switch (outputFormat) {
-                                    case "SIMPLE":
-                                        System.out.println(LogEventSimpleFormatter.of(logEvent));
-                                        break;
-                                    default:
-                                        System.out.println(new String(logEvent.getRaw(), StandardCharsets.UTF_8));
-                                }
+                while (true) {
+                    while (iterator.hasNext()) {
+                        final LogEvent logEvent = iterator.next();
+                        if (logEvent != null && logEventFilter.test(logEvent)) {
+                            switch (outputFormat) {
+                                case "SIMPLE":
+                                    System.out.println(LogEventSimpleFormatter.of(logEvent));
+                                    break;
+                                default:
+                                    System.out.println(new String(logEvent.getRaw(), StandardCharsets.UTF_8));
                             }
                         }
-                        if (cmdLine.hasOption("follow")) {
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            break;
+                    }
+                    if (cmdLine.hasOption("follow")) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
+                    } else {
+                        break;
                     }
                 }
             }
