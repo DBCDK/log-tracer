@@ -22,9 +22,12 @@ public class LogEvent {
     private String type;
     @JsonProperty("sys_json")
     private Boolean json;
+    @JsonProperty("@timestamp")
+    private OffsetDateTime kafkaTimestamp;
 
     private Level level;
-    private  String message;
+    private String message;
+    private byte[] raw;
 
     public OffsetDateTime getTimestamp() {
         return timestamp;
@@ -32,6 +35,14 @@ public class LogEvent {
 
     public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public OffsetDateTime getKafkaTimestamp() {
+        return kafkaTimestamp;
+    }
+
+    public void setKafkaTimestamp(OffsetDateTime kafkaTimestamp) {
+        this.kafkaTimestamp = kafkaTimestamp;
     }
 
     public String getHost() {
@@ -106,10 +117,19 @@ public class LogEvent {
         this.json = json;
     }
 
+    public byte[] getRaw() {
+        return raw;
+    }
+
+    public void setRaw(byte[] raw) {
+        this.raw = raw;
+    }
+
     @Override
     public String toString() {
         return "LogEvent{" +
                 "timestamp=" + timestamp +
+                ", kafkaTimestamp=" + kafkaTimestamp +
                 ", host='" + host + '\'' +
                 ", env='" + env + '\'' +
                 ", team='" + team + '\'' +

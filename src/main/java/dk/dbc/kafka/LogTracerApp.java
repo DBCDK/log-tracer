@@ -7,6 +7,7 @@ import dk.dbc.kafka.logformat.LogEventSimpleFormatter;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.event.Level;
 
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,6 +46,7 @@ public class LogTracerApp {
                 String topic = cmdLine.hasOption("topic") ? ((String) cmdLine.getParsedOptionValue("topic")) : "test";
                 String offset = cmdLine.hasOption("offset") ? ((String) cmdLine.getParsedOptionValue("offset")) : "earliest";
                 String clientID = cmdLine.hasOption("clientid") ? ((String) cmdLine.getParsedOptionValue("clientid")) : UUID.randomUUID().toString();
+                String outputFormat = cmdLine.hasOption("format") ? ((String) cmdLine.getParsedOptionValue("format")) : "RAW";
 
                 final LogEventFilter logEventFilter = new LogEventFilter();
                 if (cmdLine.hasOption("data-start")) {
@@ -86,7 +88,11 @@ public class LogTracerApp {
 
                     for (final LogEvent logEvent : consumer) {
                         if (logEvent != null && logEventFilter.test(logEvent)) {
-                            System.out.println(LogEventSimpleFormatter.of(logEvent));
+                            switch (outputFormat) {
+                                case "SIMPLE": System.out.println(LogEventSimpleFormatter.of(logEvent));
+                                    break;
+                                default: System.out.println(new String(logEvent.getRaw(), StandardCharsets.UTF_8));
+                            }
                         }
                     }
                 }

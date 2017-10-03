@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -128,7 +127,6 @@ public class Cli {
                 .desc("Relevant data app name in logs")
                 .build();
 
-
         Option data_loglevel = Option.builder("dl")
                 .longOpt("data-loglevel")
                 .numberOfArgs(1)
@@ -136,6 +134,12 @@ public class Cli {
                 .desc("Relevant log level i.e. ERROR, WARN, INFO, DEBUG, TRACE. If you specify INFO you get ERROR, WARN and INFO. ")
                 .build();
 
+        Option format = Option.builder("fmt")
+                .longOpt("format")
+                .numberOfArgs(1)
+                .required(false)
+                .desc("Output format {RAW, SIMPLE}")
+                .build();
 
 
         options.addOption(helpOption);
@@ -152,6 +156,7 @@ public class Cli {
         options.addOption(data_host);
         options.addOption(data_appid);
         options.addOption(data_loglevel);
+        options.addOption(format);
 
     }
 
@@ -222,7 +227,6 @@ public class Cli {
             } else {
                 return cmdLine;
             }
-
         }
         catch( ParseException exp ) {
             // oops, something went wrong

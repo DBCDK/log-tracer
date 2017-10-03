@@ -10,7 +10,11 @@ public class LogEventSimpleFormatter {
 
     public static String of(LogEvent logEvent) {
         final StringBuilder buffer = new StringBuilder();
-        appendBoxedField(buffer, logEvent.getTimestamp());
+        if (logEvent.getTimestamp() != null) {
+            appendBoxedField(buffer, logEvent.getTimestamp());
+        } else {
+            appendBoxedField(buffer, logEvent.getKafkaTimestamp());
+        }
         appendBoxedField(buffer, logEvent.getLevel());
         appendBoxedField(buffer, logEvent.getAppID());
         appendField(buffer, logEvent.getMessage());

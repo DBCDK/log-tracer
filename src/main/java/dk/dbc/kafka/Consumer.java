@@ -7,7 +7,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Properties;
@@ -45,12 +44,15 @@ public class Consumer implements Iterable<LogEvent> {
             @Override
             public LogEvent next() {
                 final ConsumerRecord<Integer, byte[]> record = recordsIterator.next();
+                LogEvent logEvent;
                 try {
-                    return logEventMapper.unmarshall(record.value());
+                    logEvent = logEventMapper.unmarshall(record.value());
                 } catch (UncheckedIOException e) {
-                    System.out.println(e.toString() + " " + new String(record.value(), StandardCharsets.UTF_8));
+                    // log exception??
+                    logEvent = new LogEvent();
                 }
-                return null;
+                logEvent.setRaw(record.value());
+                return logEvent;
             }
         };
     }
