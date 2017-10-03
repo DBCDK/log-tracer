@@ -67,7 +67,6 @@ public class Cli {
                 .desc("Kafka topic you want to consume")
                 .build();
 
-
         Option storeTofile = Option.builder("s")
                 .longOpt("store")
                 .numberOfArgs(1)
@@ -87,7 +86,6 @@ public class Cli {
                 .required(false)
                 .desc("Provide a client ID that can identify the client and make use of Kafkas built in offset")
                 .build();
-        // TODO listen functionality, keep consuming
         // TODO Consume a list of topics
 
         Option data_timeperiod_start = Option.builder("ds")
@@ -141,6 +139,12 @@ public class Cli {
                 .desc("Output format {RAW, SIMPLE}")
                 .build();
 
+        Option follow = Option.builder("f")
+                .longOpt("follow")
+                .required(false)
+                .numberOfArgs(0)
+                .desc("Continuously follow log events")
+                .build();
 
         options.addOption(helpOption);
         options.addOption(produceOption);
@@ -157,6 +161,7 @@ public class Cli {
         options.addOption(data_appid);
         options.addOption(data_loglevel);
         options.addOption(format);
+        options.addOption(follow);
 
     }
 
