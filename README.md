@@ -37,6 +37,8 @@ usage: Log Tracer
  -ds,--data-start <arg>      Relevant time period you want data from in
                              the format yyyy-MM-dd'T'HH:mm i.e.
                              2017-01-22T13:22
+ -f,--follow                 Continuously follow log events
+ -fmt,--format <arg>         Output format {RAW, SIMPLE}                            
  -g,--generate-test-events   Generate random log events. Simulating four
                              different environments, application ids and
                              hostnames.

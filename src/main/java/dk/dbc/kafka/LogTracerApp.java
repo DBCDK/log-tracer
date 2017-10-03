@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -85,14 +86,29 @@ public class LogTracerApp {
                 } else {
                     final Consumer consumer =
                             new Consumer(hostname, port, topic, UUID.randomUUID().toString(), offset, clientID);
+                    final Iterator<LogEvent> iterator = consumer.iterator();
 
-                    for (final LogEvent logEvent : consumer) {
-                        if (logEvent != null && logEventFilter.test(logEvent)) {
-                            switch (outputFormat) {
-                                case "SIMPLE": System.out.println(LogEventSimpleFormatter.of(logEvent));
-                                    break;
-                                default: System.out.println(new String(logEvent.getRaw(), StandardCharsets.UTF_8));
+                    while (true) {
+                        while (iterator.hasNext()) {
+                            final LogEvent logEvent = iterator.next();
+                            if (logEvent != null && logEventFilter.test(logEvent)) {
+                                switch (outputFormat) {
+                                    case "SIMPLE":
+                                        System.out.println(LogEventSimpleFormatter.of(logEvent));
+                                        break;
+                                    default:
+                                        System.out.println(new String(logEvent.getRaw(), StandardCharsets.UTF_8));
+                                }
                             }
+                        }
+                        if (cmdLine.hasOption("follow")) {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            break;
                         }
                     }
                 }
