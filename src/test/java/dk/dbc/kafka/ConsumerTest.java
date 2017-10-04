@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.UUID;
@@ -38,10 +37,9 @@ import static org.junit.Assert.assertThat;
 public class ConsumerTest {
     private static final String ZKHOST = "127.0.0.1";
     private static final String BROKERHOST = "127.0.0.1";
-    private static final String BROKERPORT = "9091";
+    private static final Integer BROKERPORT = 9091;
     private static final String TOPIC = "test";
     private static String pattern = "yyyy-MM-dd'T'HH:mm";
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
     private EmbeddedZookeeper zkServer;
     private ZkClient zkClient;

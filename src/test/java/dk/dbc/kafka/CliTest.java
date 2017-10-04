@@ -1,146 +1,144 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.md
+ */
+
 package dk.dbc.kafka;
 
-import org.apache.commons.cli.CommandLine;
 import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
-/**
- * Created by andreas on 12/28/16.
- */
 public class CliTest {
-
-    String pattern = "yyyy-MM-dd'T'HH:mm";
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+    private final static String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm";
 
     @Test
-    public void testCli() {
-        assertTrue(true);
-    }
+    public void cli() throws ParseException {
+        final SimpleDateFormat timestampFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
 
-    @Test
-    public void testCliArgs() throws ParseException {
-
-        String[] args = new String[4];
-        args[0] = "--hostname=" + "localhost";
+        final String[] args = new String[12];
+        args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
-        args[3] = "--store=" + "fileoutput.json";
+        args[3] = "--log-from=" + "2016-12-24T11:00";
+        args[4] = "--log-until=" + "2016-12-24T12:00";
+        args[5] = "--log-env=" + "env";
+        args[6] = "--log-host=" + "host";
+        args[7] = "--log-appid=" + "appId";
+        args[8] = "--clientid=" + "myId";
+        args[9] = "--offset=" + "latest";
+        args[10] = "--format=" + "SIMPLE";
+        args[11] = "--follow";
 
-        Cli cli = new Cli(args);
-        CommandLine parsedCli = cli.parse();
+        final Cli cli = new Cli(args);
 
-        assertTrue(parsedCli.hasOption("store") && parsedCli.hasOption("topic") && parsedCli.hasOption("port") && parsedCli.hasOption("hostname"));
-    }
-
-    @Test
-    public void testCliArgsWithDate() throws ParseException, org.apache.commons.cli.ParseException {
-
-        String[] args = new String[6];
-        args[0] = "--hostname=" + "localhost";
-        args[1] = "--port=" + "9092";
-        args[2] = "--topic=" + "test-topic";
-        args[3] = "--store=" + "fileoutput.json";
-        args[4] = "--data-start=" + "2016-12-24T11:00";
-        args[5] = "--data-end=" + "2016-12-25T19:00";
-
-        Cli cli = new Cli(args);
-        CommandLine parsedCli = cli.parse();
-
-
-        Date start = simpleDateFormat.parse((String)parsedCli.getParsedOptionValue("data-start"));
-        Date end = simpleDateFormat.parse((String)parsedCli.getParsedOptionValue("data-end"));
-
-        assertTrue(parsedCli.hasOption("store") && parsedCli.hasOption("topic") && parsedCli.hasOption("port") && parsedCli.hasOption("hostname") &&
-                parsedCli.hasOption("data-start") && parsedCli.hasOption("data-end"));
-        assertTrue( (start.getTime() > 0) && (end.getTime() > 0) && (end.getTime()> start.getTime()) );
+        assertThat("broker", cli.args.getString("broker"), is("localhost"));
+        assertThat("port", cli.args.getInt("port"), is(9092));
+        assertThat("topic", cli.args.getString("topic"), is("test-topic"));
+        assertThat("log-from", cli.args.get("log_from"), is(notNullValue()));
+        assertThat("log-from", cli.args.get("log_from"),
+                is(timestampFormat.parse("2016-12-24T11:00")));
+        assertThat("log-until", cli.args.get("log_until"), is(notNullValue()));
+        assertThat("log-until", cli.args.get("log_until"),
+                is(timestampFormat.parse("2016-12-24T12:00")));
+        assertThat("log-env", cli.args.getString("log_env"), is("env"));
+        assertThat("log-host", cli.args.getString("log_host"), is("host"));
+        assertThat("log-appid", cli.args.getString("log_appid"), is("appId"));
+        assertThat("clientid", cli.args.getString("clientid"), is("myId"));
+        assertThat("offset", cli.args.getString("offset"), is("latest"));
+        assertThat("format", cli.args.getString("format"), is("SIMPLE"));
+        assertThat("follow", cli.args.getBoolean("follow"), is(true));
     }
 
     @Test
-    public void testCliArgsWithEnvHostAppID() throws ParseException, org.apache.commons.cli.ParseException {
-
-        String[] args = new String[6];
-        args[0] = "--hostname=" + "localhost";
+    public void defaults() {
+        final String[] args = new String[3];
+        args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
-        args[3] = "--data-host=" + "Mesos-node-7";
-        args[4] = "--data-appid=" + "superapp";
-        args[5] = "--data-env=" + "test";
 
-        Cli cli = new Cli(args);
-        CommandLine parsedCli = cli.parse();
-
-
-        assertTrue( parsedCli.hasOption("data-appid") );
-        assertTrue(  parsedCli.hasOption("data-env"));
-        assertTrue( parsedCli.hasOption("data-host"));
-
+        final Cli cli = new Cli(args);
+        assertThat("clientid", cli.args.getString("clientid"), is(notNullValue()));
+        assertThat("offset", cli.args.getString("offset"), is("earliest"));
+        assertThat("format", cli.args.getString("format"), is("RAW"));
+        assertThat("follow", cli.args.getBoolean("follow"), is(false));
     }
 
-    @Test
-    public void testCliArgsWithEnv() throws ParseException, org.apache.commons.cli.ParseException {
+    @Test(expected = CliException.class)
+    public void missingRequiredOption() {
+        final String[] args = new String[1];
+        args[0] = "--broker=" + "localhost";
 
-        String[] args = new String[4];
-        args[0] = "--hostname=" + "localhost";
+        new Cli(args);
+    }
+
+    @Test(expected = CliException.class)
+    public void unknownOption() {
+        final String[] args = new String[4];
+        args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
-        args[3] = "--data-env=" + "test";
+        args[3] = "--unknown";
 
-        Cli cli = new Cli(args);
-        CommandLine parsedCli = cli.parse();
-
-        assertTrue(  parsedCli.hasOption("data-env"));
+        new Cli(args);
     }
 
-
-    @Test
-    public void testCliArgsWithLogHost() throws ParseException, org.apache.commons.cli.ParseException {
-
-        String[] args = new String[4];
-        args[0] = "--hostname=" + "localhost";
+    @Test(expected = CliException.class)
+    public void badlyFormattedTimestamp() {
+        final String[] args = new String[4];
+        args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
-        args[3] = "--data-host=" + "mesos-1";
+        args[3] = "--log-from=" + "yesterday";
 
-        Cli cli = new Cli(args);
-        CommandLine parsedCli = cli.parse();
-
-        assertTrue(  parsedCli.hasOption("data-host"));
+        new Cli(args);
     }
 
-    @Test(expected = ParseException.class)
-    public void testCliArgsWithWrongDate() throws ParseException {
+    @Test(expected = CliException.class)
+    public void nonIntegerPort() {
+        final String[] args = new String[3];
+        args[0] = "--broker=" + "localhost";
+        args[1] = "--port=" + "ninezeroninetwo";
+        args[2] = "--topic=" + "test-topic";
 
-        String[] args = new String[6];
-        args[0] = "--hostname=" + "localhost";
+        new Cli(args);
+    }
+
+    @Test(expected = CliException.class)
+    public void badFormatChoice() {
+        final String[] args = new String[4];
+        args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
-        args[3] = "--store=" + "fileoutput.json";
-        args[4] = "--data-start=" + "201-12-24T11:00";
-        args[5] = "--data-end=" + "2016-12-25";
+        args[3] = "--format=" + "XML";
 
-        Cli cli = new Cli(args);
-        CommandLine parsedCli = cli.parse();
-
-        assertTrue(parsedCli.hasOption("store") && parsedCli.hasOption("topic") && parsedCli.hasOption("port") && parsedCli.hasOption("hostname") &&
-                parsedCli.hasOption("date-start") && parsedCli.hasOption("date-end"));
+        new Cli(args);
     }
 
-    @Test(expected=NullPointerException.class)
-    public void testCliArgsNotAnOption() throws ParseException {
-        String[] args = new String[6];
-        args[0] = "--hostname=" + "localhost";
+    @Test(expected = CliException.class)
+    public void badOffsetChoice() {
+        final String[] args = new String[4];
+        args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
-        args[3] = "--Not-An-Option=" + "error!";
+        args[3] = "--offset=" + "now";
 
-        Cli cli = new Cli(args);
-        CommandLine parsedCli = cli.parse();
-        assertTrue(parsedCli.hasOption("topic") && parsedCli.hasOption("port") && parsedCli.hasOption("hostname"));
+        new Cli(args);
     }
 
+    @Test(expected = CliException.class)
+    public void badLogLevelChoice() {
+        final String[] args = new String[4];
+        args[0] = "--broker=" + "localhost";
+        args[1] = "--port=" + "9092";
+        args[2] = "--topic=" + "test-topic";
+        args[3] = "--log-level=" + "DANGER";
+
+        new Cli(args);
+    }
 }

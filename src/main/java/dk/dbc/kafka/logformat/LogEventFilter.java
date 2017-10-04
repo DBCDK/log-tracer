@@ -1,6 +1,6 @@
 /*
- * Copyright Dansk Bibliotekscenter a/s. Licensed under GNU 3
- * See license text in LICENSE.txt
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.md
  */
 
 package dk.dbc.kafka.logformat;
@@ -76,5 +76,17 @@ public class LogEventFilter implements Predicate<LogEvent> {
         }
 
         return allowed;
+    }
+
+    @Override
+    public String toString() {
+        return "LogEventFilter{" +
+                "from=" + from +
+                ", until=" + until +
+                ", appID='" + appID + '\'' +
+                ", host='" + host + '\'' +
+                ", env='" + env + '\'' +
+                ", loglevel=" + loglevel +
+                '}';
     }
 }
