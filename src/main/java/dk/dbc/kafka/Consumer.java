@@ -1,3 +1,8 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.md
+ */
+
 package dk.dbc.kafka;
 
 import dk.dbc.kafka.logformat.LogEvent;
@@ -16,7 +21,7 @@ public class Consumer implements Iterable<LogEvent> {
     private final String topicName;
     private final LogEventMapper logEventMapper;
 
-    public Consumer(String hostname, String port, String topicName, String groupId, String offset, String clientID) {
+    public Consumer(String hostname, Integer port, String topicName, String groupId, String offset, String clientID) {
         this.topicName = topicName;
         this.kafkaConsumerProperties = createKafkaConsumerProperties(hostname, port, groupId, offset, clientID);
         this.logEventMapper = new LogEventMapper();
@@ -57,7 +62,7 @@ public class Consumer implements Iterable<LogEvent> {
         };
     }
 
-    private Properties createKafkaConsumerProperties(String hostname, String port, String groupId, String offset, String clientID) {
+    private Properties createKafkaConsumerProperties(String hostname, Integer port, String groupId, String offset, String clientID) {
         final Properties consumerProps = new Properties();
         consumerProps.setProperty("bootstrap.servers", hostname + ":" + port);
         consumerProps.setProperty("group.id", groupId);

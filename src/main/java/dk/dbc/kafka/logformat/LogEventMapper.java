@@ -1,6 +1,6 @@
 /*
- * Copyright Dansk Bibliotekscenter a/s. Licensed under GNU 3
- * See license text in LICENSE.txt
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.md
  */
 
 package dk.dbc.kafka.logformat;

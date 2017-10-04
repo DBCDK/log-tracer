@@ -1,3 +1,8 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.md
+ */
+
 package dk.dbc.kafka.logformat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
