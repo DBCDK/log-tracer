@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.event.Level;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LogEvent {
@@ -32,6 +33,7 @@ public class LogEvent {
 
     private Level level;
     private String message;
+    private Map<String, String> mdc;
     private byte[] raw;
 
     public OffsetDateTime getTimestamp() {
@@ -80,6 +82,14 @@ public class LogEvent {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Map<String, String> getMdc() {
+        return mdc;
+    }
+
+    public void setMdc(Map<String, String> mdc) {
+        this.mdc = mdc;
     }
 
     public String getEnv() {
@@ -131,23 +141,6 @@ public class LogEvent {
     }
 
     @Override
-    public String toString() {
-        return "LogEvent{" +
-                "timestamp=" + timestamp +
-                ", kafkaTimestamp=" + kafkaTimestamp +
-                ", host='" + host + '\'' +
-                ", env='" + env + '\'' +
-                ", team='" + team + '\'' +
-                ", appID='" + appID + '\'' +
-                ", taskId='" + taskId + '\'' +
-                ", type='" + type + '\'' +
-                ", json=" + json +
-                ", level=" + level +
-                ", message='" + message + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -182,10 +175,16 @@ public class LogEvent {
         if (json != null ? !json.equals(logEvent.json) : logEvent.json != null) {
             return false;
         }
+        if (kafkaTimestamp != null ? !kafkaTimestamp.equals(logEvent.kafkaTimestamp) : logEvent.kafkaTimestamp != null) {
+            return false;
+        }
         if (level != logEvent.level) {
             return false;
         }
-        return message != null ? message.equals(logEvent.message) : logEvent.message == null;
+        if (message != null ? !message.equals(logEvent.message) : logEvent.message != null) {
+            return false;
+        }
+        return mdc != null ? mdc.equals(logEvent.mdc) : logEvent.mdc == null;
     }
 
     @Override
@@ -198,8 +197,10 @@ public class LogEvent {
         result = 31 * result + (taskId != null ? taskId.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (json != null ? json.hashCode() : 0);
+        result = 31 * result + (kafkaTimestamp != null ? kafkaTimestamp.hashCode() : 0);
         result = 31 * result + (level != null ? level.hashCode() : 0);
         result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (mdc != null ? mdc.hashCode() : 0);
         return result;
     }
 }
