@@ -20,6 +20,8 @@ public class LogEventSimpleFormatter {
         }
         appendBoxedField(buffer, logEvent.getLevel());
         appendBoxedField(buffer, logEvent.getAppID());
+        appendBoxedField(buffer, logEvent.getThread());
+        appendLogger(buffer, logEvent.getLogger());
         if (logEvent.getMdc() != null) {
             appendMdc(buffer, logEvent.getMdc());
         }
@@ -44,6 +46,14 @@ public class LogEventSimpleFormatter {
             buffer.append('-');
         }
         buffer.append("] ");
+    }
+
+    private static void appendLogger(StringBuilder buffer, String logger) {
+        if (logger != null) {
+            appendField(buffer, logger.substring(logger.lastIndexOf('.') + 1));
+        } else {
+            buffer.append("- ");
+        }
     }
 
     private static void appendMdc(StringBuilder buffer, Map<String, String> mdc) {
