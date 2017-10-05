@@ -33,6 +33,8 @@ public class LogEvent {
 
     private Level level;
     private String message;
+    private String thread;
+    private String logger;
     private Map<String, String> mdc;
     private byte[] raw;
 
@@ -82,6 +84,22 @@ public class LogEvent {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getThread() {
+        return thread;
+    }
+
+    public void setThread(String thread) {
+        this.thread = thread;
+    }
+
+    public String getLogger() {
+        return logger;
+    }
+
+    public void setLogger(String logger) {
+        this.logger = logger;
     }
 
     public Map<String, String> getMdc() {
@@ -184,6 +202,12 @@ public class LogEvent {
         if (message != null ? !message.equals(logEvent.message) : logEvent.message != null) {
             return false;
         }
+        if (thread != null ? !thread.equals(logEvent.thread) : logEvent.thread != null) {
+            return false;
+        }
+        if (logger != null ? !logger.equals(logEvent.logger) : logEvent.logger != null) {
+            return false;
+        }
         return mdc != null ? mdc.equals(logEvent.mdc) : logEvent.mdc == null;
     }
 
@@ -200,7 +224,29 @@ public class LogEvent {
         result = 31 * result + (kafkaTimestamp != null ? kafkaTimestamp.hashCode() : 0);
         result = 31 * result + (level != null ? level.hashCode() : 0);
         result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (thread != null ? thread.hashCode() : 0);
+        result = 31 * result + (logger != null ? logger.hashCode() : 0);
         result = 31 * result + (mdc != null ? mdc.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "LogEvent{" +
+                "timestamp=" + timestamp +
+                ", host='" + host + '\'' +
+                ", env='" + env + '\'' +
+                ", team='" + team + '\'' +
+                ", appID='" + appID + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", type='" + type + '\'' +
+                ", json=" + json +
+                ", kafkaTimestamp=" + kafkaTimestamp +
+                ", level=" + level +
+                ", message='" + message + '\'' +
+                ", thread='" + thread + '\'' +
+                ", logger='" + logger + '\'' +
+                ", mdc=" + mdc +
+                '}';
     }
 }
