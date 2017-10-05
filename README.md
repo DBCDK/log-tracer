@@ -23,7 +23,7 @@ Log-tracer is a commandline tool and needs parameters related to the Kafka insta
 ```bash
 
 $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar -h
-usage: log-tracer [-h] -b BROKER -p PORT -t TOPIC [-o {earliest,latest}] [-c CLIENTID] [--log-env LOG_ENV] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,SIMPLE}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL]
+usage: log-tracer [-h] -b BROKER -p PORT -t TOPIC [-o {earliest,latest}] [-c CLIENTID] [--log-env LOG_ENV] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,JAVA}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL]
 
 optional arguments:
   -h, --help             show this help message and exit
@@ -41,7 +41,7 @@ optional arguments:
   --log-appid LOG_APPID  Log application ID filter
   --log-level {ERROR,WARN,INFO,DEBUG,TRACE}
                          Log level filter, get only level and above
-  --format {RAW,SIMPLE}  Output format
+  --format {RAW,JAVA}    Output format
   -f, --follow           Consume log events continuously
   --log-from LOG_FROM    Log timestamp from filter in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22
   --log-until LOG_UNTIL  Log timestamp until filter in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22
