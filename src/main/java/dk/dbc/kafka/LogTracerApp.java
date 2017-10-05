@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.UUID;
 
 public class LogTracerApp {
+    private static final int EXIT_CUTOFF = 25000;
+
     public static void main(String[] args) {
         try {
             runWith(args);
@@ -33,17 +35,24 @@ public class LogTracerApp {
         final String format = cli.args.getString("format");
         final boolean follow = cli.args.getBoolean("follow");
 
-        final Iterator<LogEvent> iterator = new Consumer(
+        final Consumer consumer = new Consumer(
                 cli.args.getString("broker"),
                 cli.args.getInt("port"),
                 cli.args.getString("topic"),
                 UUID.randomUUID().toString(),
                 cli.args.getString("offset"),
-                cli.args.getString("clientid"))
-                .iterator();
+                cli.args.getString("clientid"));
 
+        if (logEventFilter.getFrom() != null) {
+            consumer.setFromDateTime(logEventFilter.getFrom());
+        }
+
+        final Iterator<LogEvent> iterator = consumer.iterator();
         while (true) {
             while (iterator.hasNext()) {
+                if (logEventFilter.getNumberOfExitEvents() >= EXIT_CUTOFF) {
+                    break;
+                }
                 final LogEvent logEvent = iterator.next();
                 if (logEvent != null && logEventFilter.test(logEvent)) {
                     switch (format) {

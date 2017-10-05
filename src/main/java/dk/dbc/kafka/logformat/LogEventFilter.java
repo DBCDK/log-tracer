@@ -16,10 +16,15 @@ public class LogEventFilter implements Predicate<LogEvent> {
     private OffsetDateTime from, until;
     private String appID, host, env;
     private Level loglevel;
+    private int numberOfExitEvents;
 
     public LogEventFilter setFrom(Date from) {
         this.from = OffsetDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault());
         return this;
+    }
+
+    public OffsetDateTime getFrom() {
+        return from;
     }
 
     public LogEventFilter setUntil(Date until) {
@@ -47,6 +52,10 @@ public class LogEventFilter implements Predicate<LogEvent> {
         return this;
     }
 
+    public int getNumberOfExitEvents() {
+        return numberOfExitEvents;
+    }
+
     @Override
     public boolean test(LogEvent logEvent) {
         boolean allowed = true;
@@ -57,6 +66,7 @@ public class LogEventFilter implements Predicate<LogEvent> {
 
         if (until != null && (logEvent.getTimestamp() == null || logEvent.getTimestamp().isAfter(until))) {
             allowed = false;
+            numberOfExitEvents++;
         }
 
         if (appID != null && !appID.isEmpty() && !appID.equalsIgnoreCase(logEvent.getAppID())) {
