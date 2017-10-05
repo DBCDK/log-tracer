@@ -35,7 +35,7 @@ public class Cli {
                 .help("Kafka topic to consume");
         parser.addArgument("-o", "--offset")
                 .choices("earliest", "latest")
-                .setDefault("earliest")
+                .setDefault("latest")
                 .help("Consume from the beginning or the end of the topic");
         parser.addArgument("-c", "--clientid")
                 .setDefault(UUID.randomUUID().toString())

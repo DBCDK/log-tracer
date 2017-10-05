@@ -31,7 +31,7 @@ public class CliTest {
         args[6] = "--log-host=" + "host";
         args[7] = "--log-appid=" + "appId";
         args[8] = "--clientid=" + "myId";
-        args[9] = "--offset=" + "latest";
+        args[9] = "--offset=" + "earliest";
         args[10] = "--format=" + "JAVA";
         args[11] = "--follow";
 
@@ -50,7 +50,7 @@ public class CliTest {
         assertThat("log-host", cli.args.getString("log_host"), is("host"));
         assertThat("log-appid", cli.args.getString("log_appid"), is("appId"));
         assertThat("clientid", cli.args.getString("clientid"), is("myId"));
-        assertThat("offset", cli.args.getString("offset"), is("latest"));
+        assertThat("offset", cli.args.getString("offset"), is("earliest"));
         assertThat("format", cli.args.getString("format"), is("JAVA"));
         assertThat("follow", cli.args.getBoolean("follow"), is(true));
     }
@@ -64,7 +64,7 @@ public class CliTest {
 
         final Cli cli = new Cli(args);
         assertThat("clientid", cli.args.getString("clientid"), is(notNullValue()));
-        assertThat("offset", cli.args.getString("offset"), is("earliest"));
+        assertThat("offset", cli.args.getString("offset"), is("latest"));
         assertThat("format", cli.args.getString("format"), is("RAW"));
         assertThat("follow", cli.args.getBoolean("follow"), is(false));
     }
