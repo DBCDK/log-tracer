@@ -7,7 +7,7 @@ package dk.dbc.kafka;
 
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventFilter;
-import dk.dbc.kafka.logformat.LogEventSimpleFormatter;
+import dk.dbc.kafka.logformat.LogEventFormatterJava;
 import org.slf4j.event.Level;
 
 import java.nio.charset.StandardCharsets;
@@ -30,7 +30,7 @@ public class LogTracerApp {
     private static void runWith(String[] args) throws CliException {
         final Cli cli = new Cli(args);
         final LogEventFilter logEventFilter = createFilter(cli);
-        final String outputFormat = cli.args.getString("format");
+        final String format = cli.args.getString("format");
         final boolean follow = cli.args.getBoolean("follow");
 
         final Iterator<LogEvent> iterator = new Consumer(
@@ -46,10 +46,10 @@ public class LogTracerApp {
             while (iterator.hasNext()) {
                 final LogEvent logEvent = iterator.next();
                 if (logEvent != null && logEventFilter.test(logEvent)) {
-                    switch (outputFormat) {
-                        case "SIMPLE":
+                    switch (format) {
+                        case "JAVA":
                             System.out.println(
-                                    LogEventSimpleFormatter.of(logEvent));
+                                    LogEventFormatterJava.of(logEvent));
                             break;
                         default:
                             System.out.println(new String(

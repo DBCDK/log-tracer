@@ -50,7 +50,7 @@ public class Cli {
                 .choices("ERROR", "WARN", "INFO", "DEBUG", "TRACE")
                 .help("Log level filter, get only level and above");
         parser.addArgument("--format")
-                .choices("RAW", "SIMPLE")
+                .choices("RAW", "JAVA")
                 .setDefault("RAW")
                 .help("Output format");
         parser.addArgument("-f", "--follow")

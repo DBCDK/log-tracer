@@ -32,7 +32,7 @@ public class CliTest {
         args[7] = "--log-appid=" + "appId";
         args[8] = "--clientid=" + "myId";
         args[9] = "--offset=" + "latest";
-        args[10] = "--format=" + "SIMPLE";
+        args[10] = "--format=" + "JAVA";
         args[11] = "--follow";
 
         final Cli cli = new Cli(args);
@@ -51,7 +51,7 @@ public class CliTest {
         assertThat("log-appid", cli.args.getString("log_appid"), is("appId"));
         assertThat("clientid", cli.args.getString("clientid"), is("myId"));
         assertThat("offset", cli.args.getString("offset"), is("latest"));
-        assertThat("format", cli.args.getString("format"), is("SIMPLE"));
+        assertThat("format", cli.args.getString("format"), is("JAVA"));
         assertThat("follow", cli.args.getBoolean("follow"), is(true));
     }
 

@@ -8,8 +8,8 @@ package dk.dbc.kafka.logformat;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class LogEventSimpleFormatter {
-    private LogEventSimpleFormatter() {}
+public class LogEventFormatterJava {
+    private LogEventFormatterJava() {}
 
     public static String of(LogEvent logEvent) {
         final StringBuilder buffer = new StringBuilder();
@@ -57,8 +57,7 @@ public class LogEventSimpleFormatter {
     }
 
     private static void appendMdc(StringBuilder buffer, Map<String, String> mdc) {
-        new TreeMap<>(mdc).forEach((k,v) -> {
-            buffer.append(k).append("=\"").append(v).append("\" ");
-        });
+        new TreeMap<>(mdc).forEach((k,v) ->
+                buffer.append(k).append("=\"").append(v).append("\" "));
     }
 }
