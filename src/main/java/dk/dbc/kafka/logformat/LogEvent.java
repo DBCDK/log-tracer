@@ -28,8 +28,6 @@ public class LogEvent {
     private String type;
     @JsonProperty("sys_json")
     private Boolean json;
-    @JsonProperty("@timestamp")
-    private OffsetDateTime kafkaTimestamp;
 
     private Level level;
     private String message;
@@ -44,14 +42,6 @@ public class LogEvent {
 
     public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public OffsetDateTime getKafkaTimestamp() {
-        return kafkaTimestamp;
-    }
-
-    public void setKafkaTimestamp(OffsetDateTime kafkaTimestamp) {
-        this.kafkaTimestamp = kafkaTimestamp;
     }
 
     public String getHost() {
@@ -193,9 +183,6 @@ public class LogEvent {
         if (json != null ? !json.equals(logEvent.json) : logEvent.json != null) {
             return false;
         }
-        if (kafkaTimestamp != null ? !kafkaTimestamp.equals(logEvent.kafkaTimestamp) : logEvent.kafkaTimestamp != null) {
-            return false;
-        }
         if (level != logEvent.level) {
             return false;
         }
@@ -221,7 +208,6 @@ public class LogEvent {
         result = 31 * result + (taskId != null ? taskId.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (json != null ? json.hashCode() : 0);
-        result = 31 * result + (kafkaTimestamp != null ? kafkaTimestamp.hashCode() : 0);
         result = 31 * result + (level != null ? level.hashCode() : 0);
         result = 31 * result + (message != null ? message.hashCode() : 0);
         result = 31 * result + (thread != null ? thread.hashCode() : 0);
@@ -241,7 +227,6 @@ public class LogEvent {
                 ", taskId='" + taskId + '\'' +
                 ", type='" + type + '\'' +
                 ", json=" + json +
-                ", kafkaTimestamp=" + kafkaTimestamp +
                 ", level=" + level +
                 ", message='" + message + '\'' +
                 ", thread='" + thread + '\'' +

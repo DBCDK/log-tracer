@@ -8,17 +8,20 @@ package dk.dbc.kafka;
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 
 import java.io.UncheckedIOException;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -45,30 +48,22 @@ public class Consumer implements Iterable<LogEvent> {
             {
                 subscribe(kafkaConsumer, topicName, timestamp);
             }
-            ConsumerRecords<Integer, byte[]> records;
-            Iterator<ConsumerRecord<Integer, byte[]>> recordsIterator;
+            
+            final PriorityQueue<ConsumedItem> consumedItems =
+                    new PriorityQueue<>(3000, new ConsumedItemComparator());
 
             @Override
             public boolean hasNext() {
-                if (recordsIterator == null || !recordsIterator.hasNext()) {
-                    records = kafkaConsumer.poll(3000);
-                    recordsIterator = records.iterator();
+                if (consumedItems.isEmpty() || consumedItems.size() < 1000) {
+                    kafkaConsumer.poll(3000).forEach(record
+                            -> consumedItems.add(new ConsumedItem(record)));
                 }
-                return recordsIterator.hasNext();
+                return !consumedItems.isEmpty();
             }
 
             @Override
             public LogEvent next() {
-                final ConsumerRecord<Integer, byte[]> record = recordsIterator.next();
-                LogEvent logEvent;
-                try {
-                    logEvent = logEventMapper.unmarshall(record.value());
-                } catch (UncheckedIOException e) {
-                    // log exception??
-                    logEvent = new LogEvent();
-                }
-                logEvent.setRaw(record.value());
-                return logEvent;
+                return consumedItems.poll().toLogEvent();
             }
         };
     }
@@ -81,7 +76,7 @@ public class Consumer implements Iterable<LogEvent> {
         consumerProps.setProperty("key.deserializer", "org.apache.kafka.common.serialization.IntegerDeserializer");
         consumerProps.setProperty("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         consumerProps.put("auto.offset.reset", offset);  // The consumer can starts from the beginning of the topic or the end
-        consumerProps.put("max.poll.records", "100");
+        consumerProps.put("max.poll.records", "2000");
         return consumerProps;
     }
 
@@ -106,5 +101,45 @@ public class Consumer implements Iterable<LogEvent> {
                 .filter(entry -> entry.getValue() != null)
                 .forEach(entry -> kafkaConsumer.seek(
                         entry.getKey(), entry.getValue().offset()));
+    }
+
+    private class ConsumedItem {
+        private final ConsumerRecord<Integer, byte[]> consumerRecord;
+        private final LogEvent logEvent;
+
+        ConsumedItem(ConsumerRecord<Integer, byte[]> consumerRecord) {
+            this.consumerRecord = consumerRecord;
+            this.logEvent = toLogEvent(consumerRecord);
+        }
+
+        private LogEvent toLogEvent(ConsumerRecord<Integer, byte[]> consumerRecord) {
+            LogEvent logEvent;
+            try {
+                logEvent = logEventMapper.unmarshall(consumerRecord.value());
+            } catch (UncheckedIOException e) {
+                // log exception??
+                logEvent = new LogEvent();
+            }
+            logEvent.setRaw(consumerRecord.value());
+            if (logEvent.getTimestamp() == null) {
+                // No timestamp in record value, use kafka timestamp instead
+                logEvent.setTimestamp(OffsetDateTime.ofInstant(
+                        Instant.ofEpochMilli(consumerRecord.timestamp()), ZoneId.systemDefault()));
+            }
+            return logEvent;
+        }
+
+        LogEvent toLogEvent() {
+            return logEvent;
+        }
+    }
+
+    private static class ConsumedItemComparator implements Comparator<ConsumedItem> {
+        @Override
+        public int compare(ConsumedItem a, ConsumedItem b) {
+            long byTimestamp = a.toLogEvent().getTimestamp().toInstant().toEpochMilli()
+                    - b.toLogEvent().getTimestamp().toInstant().toEpochMilli();
+            return Long.signum(byTimestamp);
+        }
     }
 }
