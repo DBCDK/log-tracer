@@ -13,11 +13,7 @@ public class LogEventFormatterJava {
 
     public static String of(LogEvent logEvent) {
         final StringBuilder buffer = new StringBuilder();
-        if (logEvent.getTimestamp() != null) {
-            appendBoxedField(buffer, logEvent.getTimestamp());
-        } else {
-            appendBoxedField(buffer, logEvent.getKafkaTimestamp());
-        }
+        appendBoxedField(buffer, logEvent.getTimestamp());
         appendBoxedField(buffer, logEvent.getLevel());
         appendBoxedField(buffer, logEvent.getAppID());
         appendBoxedField(buffer, logEvent.getThread());
