@@ -43,9 +43,11 @@ public class Cli {
         parser.addArgument("--log-env")
                 .help("Log environment filter, ex. prod or staging");
         parser.addArgument("--log-host")
-                .help("Log hostname filter");
+                .action(Arguments.append())
+                .help("Log hostname filter, repeatable");
         parser.addArgument("--log-appid")
-                .help("Log application ID filter");
+                .action(Arguments.append())
+                .help("Log application ID filter, repeatable");
         parser.addArgument("--log-level")
                 .choices("ERROR", "WARN", "INFO", "DEBUG", "TRACE")
                 .help("Log level filter, get only level and above");

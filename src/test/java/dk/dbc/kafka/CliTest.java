@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -21,19 +22,21 @@ public class CliTest {
     public void cli() throws ParseException {
         final SimpleDateFormat timestampFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
 
-        final String[] args = new String[12];
+        final String[] args = new String[14];
         args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9092";
         args[2] = "--topic=" + "test-topic";
         args[3] = "--log-from=" + "2016-12-24T11:00";
         args[4] = "--log-until=" + "2016-12-24T12:00";
         args[5] = "--log-env=" + "env";
-        args[6] = "--log-host=" + "host";
-        args[7] = "--log-appid=" + "appId";
-        args[8] = "--clientid=" + "myId";
-        args[9] = "--offset=" + "earliest";
-        args[10] = "--format=" + "JAVA";
-        args[11] = "--follow";
+        args[6] = "--log-host=" + "host1";
+        args[7] = "--log-host=" + "host2";
+        args[8] = "--log-appid=" + "appId1";
+        args[9] = "--log-appid=" + "appId2";
+        args[10] = "--clientid=" + "myId";
+        args[11] = "--offset=" + "earliest";
+        args[12] = "--format=" + "JAVA";
+        args[13] = "--follow";
 
         final Cli cli = new Cli(args);
 
@@ -47,8 +50,8 @@ public class CliTest {
         assertThat("log-until", cli.args.get("log_until"),
                 is(timestampFormat.parse("2016-12-24T12:00")));
         assertThat("log-env", cli.args.getString("log_env"), is("env"));
-        assertThat("log-host", cli.args.getString("log_host"), is("host"));
-        assertThat("log-appid", cli.args.getString("log_appid"), is("appId"));
+        assertThat("log-host", cli.args.getList("log_host"), is(Arrays.asList("host1", "host2")));
+        assertThat("log-appid", cli.args.getList("log_appid"), is(Arrays.asList("appId1", "appId2")));
         assertThat("clientid", cli.args.getString("clientid"), is("myId"));
         assertThat("offset", cli.args.getString("offset"), is("earliest"));
         assertThat("format", cli.args.getString("format"), is("JAVA"));

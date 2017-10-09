@@ -37,8 +37,8 @@ optional arguments:
   -c CLIENTID, --clientid CLIENTID
                          Provide a client ID to identify the client and make use of Kafkas built in offset
   --log-env LOG_ENV      Log environment filter, ex. prod or staging
-  --log-host LOG_HOST    Log hostname filter
-  --log-appid LOG_APPID  Log application ID filter
+  --log-host LOG_HOST    Log hostname filter, repeatable
+  --log-appid LOG_APPID  Log application ID filter, repeatable
   --log-level {ERROR,WARN,INFO,DEBUG,TRACE}
                          Log level filter, get only level and above
   --format {RAW,JAVA}    Output format
@@ -53,9 +53,9 @@ Note that you are able to filter the log-events
 ```bash
 $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-env dev
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-host mesos-node-2
+$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-host mesos-node-1 --log-host mesos-node-2
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-appid dashing-database
+$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-appid dashing-database --log-appid dashing-webapp
 
 $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-from 2017-01-06T15:05 --log-until 2017-01-06T15:06
 

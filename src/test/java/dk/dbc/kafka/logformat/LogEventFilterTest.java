@@ -11,6 +11,8 @@ import org.slf4j.event.Level;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -52,8 +54,10 @@ public class LogEventFilterTest {
 
     @Test
     public void appIdFilter() {
+        final Set<String> appIDs = new HashSet<>();
+        appIDs.add("testApp");
         final LogEventFilter logEventFilter = new LogEventFilter()
-                .setAppID("testApp");
+                .setAppIDs(appIDs);
         final LogEvent logEvent = new LogEvent();
         assertThat("no appID", logEventFilter.test(logEvent), is(false));
         logEvent.setAppID("notTestApp");
@@ -76,8 +80,10 @@ public class LogEventFilterTest {
     
     @Test
     public void hostFilter() {
+        final Set<String> hosts = new HashSet<>();
+        hosts.add("testHost");
         final LogEventFilter logEventFilter = new LogEventFilter()
-                .setHost("testHost");
+                .setHosts(hosts);
         final LogEvent logEvent = new LogEvent();
         assertThat("no host", logEventFilter.test(logEvent), is(false));
         logEvent.setHost("notTestHost");
