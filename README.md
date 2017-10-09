@@ -65,7 +65,5 @@ $ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker lo
 ```
 
 # log format
-The required  JSON message format for all log-events
-`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","hostname":"mesos-node-7","sys_appid":"any-application-with-modern-logging","level":"DEBUG","sys_env":"prod","message":"the log message"}`
-
-With no linebreaks.
+The optimal JSON message format for all log-events
+`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","host":"mesos-node-7","sys_appid":"any-application-with-modern-logging","level":"DEBUG","sys_env":"prod","message":"the log message", "stack_trace": ""}`
