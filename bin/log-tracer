@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+# See license text in LICENSE.md
+#
+
+log_tracer_home="$HOME/.log-tracer"
+log_tracer_archive="${log_tracer_home}/archive"
+log_tracer_bin="${log_tracer_home}/bin"
+
+case "$1" in
+    selfupdate)
+    ${log_tracer_bin}/install.sh
+    ;;
+    *)
+    java -jar ${log_tracer_archive}/log-tracer-current.jar ${LOG_TRACER_OPTS} "$@"
+    ;;
+esac
