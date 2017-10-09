@@ -10,11 +10,14 @@ import org.slf4j.event.Level;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class LogEventFilter implements Predicate<LogEvent> {
     private OffsetDateTime from, until;
-    private String appID, host, env;
+    private Set<String> appIDs;
+    private Set<String> hosts;
+    private String env;
     private Level loglevel;
     private int numberOfExitEvents;
 
@@ -32,13 +35,13 @@ public class LogEventFilter implements Predicate<LogEvent> {
         return this;
     }
 
-    public LogEventFilter setAppID(String appID) {
-        this.appID = appID;
+    public LogEventFilter setAppIDs(Set<String> appIDs) {
+        this.appIDs = appIDs;
         return this;
     }
 
-    public LogEventFilter setHost(String host) {
-        this.host = host;
+    public LogEventFilter setHosts(Set<String> hosts) {
+        this.hosts = hosts;
         return this;
     }
 
@@ -69,7 +72,7 @@ public class LogEventFilter implements Predicate<LogEvent> {
             numberOfExitEvents++;
         }
 
-        if (appID != null && !appID.isEmpty() && !appID.equalsIgnoreCase(logEvent.getAppID())) {
+        if (appIDs != null && !appIDs.contains(logEvent.getAppID())) {
             allowed = false;
         }
 
@@ -77,7 +80,7 @@ public class LogEventFilter implements Predicate<LogEvent> {
             allowed = false;
         }
 
-        if (host != null && !host.isEmpty() && !host.equalsIgnoreCase(logEvent.getHost())) {
+        if (hosts != null && !hosts.contains(logEvent.getHost())) {
             allowed = false;
         }
 
@@ -93,8 +96,8 @@ public class LogEventFilter implements Predicate<LogEvent> {
         return "LogEventFilter{" +
                 "from=" + from +
                 ", until=" + until +
-                ", appID='" + appID + '\'' +
-                ", host='" + host + '\'' +
+                ", appIDs=" + appIDs +
+                ", hosts=" + hosts +
                 ", env='" + env + '\'' +
                 ", loglevel=" + loglevel +
                 '}';

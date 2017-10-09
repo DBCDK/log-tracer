@@ -11,6 +11,7 @@ import dk.dbc.kafka.logformat.LogEventFormatterJava;
 import org.slf4j.event.Level;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -93,11 +94,11 @@ public class LogTracerApp {
         }
 
         if (cli.args.get("log_host") != null) {
-            logEventFilter.setHost(cli.args.getString("log_host"));
+            logEventFilter.setHosts(new HashSet<>(cli.args.getList("log_host")));
         }
 
         if (cli.args.get("log_appid") != null) {
-            logEventFilter.setAppID(cli.args.getString("log_appid"));
+            logEventFilter.setAppIDs(new HashSet<>(cli.args.getList("log_appid")));
         }
 
         if (cli.args.get("log_level") != null) {
