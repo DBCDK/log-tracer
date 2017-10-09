@@ -28,6 +28,8 @@ public class LogEvent {
     private String type;
     @JsonProperty("sys_json")
     private Boolean json;
+    @JsonProperty("stack_trace")
+    private String stacktrace;
 
     private Level level;
     private String message;
@@ -74,6 +76,14 @@ public class LogEvent {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getStacktrace() {
+        return stacktrace;
+    }
+
+    public void setStacktrace(String stacktrace) {
+        this.stacktrace = stacktrace;
     }
 
     public String getThread() {
@@ -189,6 +199,9 @@ public class LogEvent {
         if (message != null ? !message.equals(logEvent.message) : logEvent.message != null) {
             return false;
         }
+        if (stacktrace != null ? !stacktrace.equals(logEvent.stacktrace) : logEvent.stacktrace != null) {
+            return false;
+        }
         if (thread != null ? !thread.equals(logEvent.thread) : logEvent.thread != null) {
             return false;
         }
@@ -210,6 +223,7 @@ public class LogEvent {
         result = 31 * result + (json != null ? json.hashCode() : 0);
         result = 31 * result + (level != null ? level.hashCode() : 0);
         result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (stacktrace != null ? stacktrace.hashCode() : 0);
         result = 31 * result + (thread != null ? thread.hashCode() : 0);
         result = 31 * result + (logger != null ? logger.hashCode() : 0);
         result = 31 * result + (mdc != null ? mdc.hashCode() : 0);
@@ -229,6 +243,7 @@ public class LogEvent {
                 ", json=" + json +
                 ", level=" + level +
                 ", message='" + message + '\'' +
+                ", stacktrace='" + stacktrace + '\'' +
                 ", thread='" + thread + '\'' +
                 ", logger='" + logger + '\'' +
                 ", mdc=" + mdc +

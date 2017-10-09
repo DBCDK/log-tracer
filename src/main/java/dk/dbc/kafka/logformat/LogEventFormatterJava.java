@@ -21,7 +21,16 @@ public class LogEventFormatterJava {
         if (logEvent.getMdc() != null) {
             appendMdc(buffer, logEvent.getMdc());
         }
-        appendField(buffer, logEvent.getMessage());
+        final String message = logEvent.getMessage();
+        final String stacktrace = logEvent.getStacktrace();
+        if (message != null && !message.isEmpty()) {
+            buffer.append(message);
+            if (stacktrace != null && !stacktrace.isEmpty()) {
+                buffer.append('\n').append(stacktrace);
+            }
+        } else if(stacktrace != null && !stacktrace.isEmpty()) {
+            buffer.append(stacktrace);
+        }
         return buffer.toString();
     }
 
