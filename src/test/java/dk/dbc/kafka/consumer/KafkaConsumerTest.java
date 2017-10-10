@@ -3,7 +3,7 @@
  * See license text in LICENSE.md
  */
 
-package dk.dbc.kafka;
+package dk.dbc.kafka.consumer;
 
 import dk.dbc.kafka.logformat.LogEvent;
 import kafka.admin.AdminUtils;
@@ -34,12 +34,11 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class ConsumerTest {
+public class KafkaConsumerTest {
     private static final String ZKHOST = "127.0.0.1";
     private static final String BROKERHOST = "127.0.0.1";
     private static final Integer BROKERPORT = 9091;
     private static final String TOPIC = "test";
-    private static String pattern = "yyyy-MM-dd'T'HH:mm";
 
     private EmbeddedZookeeper zkServer;
     private ZkClient zkClient;
@@ -85,7 +84,7 @@ public class ConsumerTest {
     public void consume() {
         produceLogEvents();
 
-        final Consumer consumer = new Consumer(BROKERHOST, BROKERPORT, TOPIC, UUID.randomUUID().toString(),
+        final KafkaConsumer consumer = new KafkaConsumer(BROKERHOST, BROKERPORT, TOPIC, UUID.randomUUID().toString(),
                 "earliest", "new-test");
         int eventCount = 0;
         for (LogEvent event : consumer) {

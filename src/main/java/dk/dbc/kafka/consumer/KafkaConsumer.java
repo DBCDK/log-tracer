@@ -3,12 +3,11 @@
  * See license text in LICENSE.md
  */
 
-package dk.dbc.kafka;
+package dk.dbc.kafka.consumer;
 
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 
 import java.io.UncheckedIOException;
@@ -25,15 +24,15 @@ import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class Consumer implements Iterable<LogEvent> {
-    private final Properties kafkaConsumerProperties;
+public class KafkaConsumer implements Consumer {
+    private final Properties kafkaProperties;
     private final String topicName;
     private final LogEventMapper logEventMapper;
     private long timestamp;
 
-    public Consumer(String hostname, Integer port, String topicName, String groupId, String offset, String clientID) {
+    public KafkaConsumer(String hostname, Integer port, String topicName, String groupId, String offset, String clientID) {
         this.topicName = topicName;
-        this.kafkaConsumerProperties = createKafkaConsumerProperties(hostname, port, groupId, offset, clientID);
+        this.kafkaProperties = createKafkaProperties(hostname, port, groupId, offset, clientID);
         this.logEventMapper = new LogEventMapper();
     }
 
@@ -44,9 +43,10 @@ public class Consumer implements Iterable<LogEvent> {
     @Override
     public Iterator<LogEvent> iterator() {
         return new Iterator<LogEvent>() {
-            final KafkaConsumer<Integer, byte[]> kafkaConsumer = new KafkaConsumer<>(kafkaConsumerProperties);
+            final org.apache.kafka.clients.consumer.KafkaConsumer<Integer, byte[]> kafka =
+                    new org.apache.kafka.clients.consumer.KafkaConsumer<>(kafkaProperties);
             {
-                subscribe(kafkaConsumer, topicName, timestamp);
+                subscribe(kafka, topicName, timestamp);
             }
             
             final PriorityQueue<ConsumedItem> consumedItems =
@@ -55,7 +55,7 @@ public class Consumer implements Iterable<LogEvent> {
             @Override
             public boolean hasNext() {
                 if (consumedItems.isEmpty() || consumedItems.size() < 1000) {
-                    kafkaConsumer.poll(3000).forEach(record
+                    kafka.poll(3000).forEach(record
                             -> consumedItems.add(new ConsumedItem(record)));
                 }
                 return !consumedItems.isEmpty();
@@ -68,47 +68,49 @@ public class Consumer implements Iterable<LogEvent> {
         };
     }
 
-    private Properties createKafkaConsumerProperties(String hostname, Integer port, String groupId, String offset, String clientID) {
-        final Properties consumerProps = new Properties();
-        consumerProps.setProperty("bootstrap.servers", hostname + ":" + port);
-        consumerProps.setProperty("group.id", groupId);
-        consumerProps.setProperty("client.id", clientID); // UUID.randomUUID().toString()
-        consumerProps.setProperty("key.deserializer", "org.apache.kafka.common.serialization.IntegerDeserializer");
-        consumerProps.setProperty("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
-        consumerProps.put("auto.offset.reset", offset);  // The consumer can starts from the beginning of the topic or the end
-        consumerProps.put("max.poll.records", "2000");
-        return consumerProps;
+    private Properties createKafkaProperties(String hostname, Integer port, String groupId, String offset, String clientID) {
+        final Properties properties = new Properties();
+        properties.setProperty("bootstrap.servers", hostname + ":" + port);
+        properties.setProperty("group.id", groupId);
+        properties.setProperty("client.id", clientID); // UUID.randomUUID().toString()
+        properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.IntegerDeserializer");
+        properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+        properties.put("auto.offset.reset", offset);  // The consumer can starts from the beginning of the topic or the end
+        properties.put("max.poll.records", "2000");
+        return properties;
     }
 
-    private void subscribe(KafkaConsumer<Integer, byte[]> kafkaConsumer, String topicName, long timestamp) {
+    private void subscribe(
+            org.apache.kafka.clients.consumer.KafkaConsumer<Integer, byte[]> kafka,
+            String topicName, long timestamp) {
         if (timestamp > 0) {
-            seekToOffsetsForTimestamp(kafkaConsumer, topicName, timestamp);
+            seekToOffsetsForTimestamp(kafka, topicName, timestamp);
         } else {
-            kafkaConsumer.subscribe(Collections.singletonList(topicName));
+            kafka.subscribe(Collections.singletonList(topicName));
         }
     }
 
-    private void seekToOffsetsForTimestamp(KafkaConsumer<Integer, byte[]> kafkaConsumer, String topicName, long timestamp) {
-        final List<TopicPartition> topicPartitions = kafkaConsumer.partitionsFor(topicName)
+    private void seekToOffsetsForTimestamp(
+            org.apache.kafka.clients.consumer.KafkaConsumer<Integer, byte[]> kafka,
+            String topicName, long timestamp) {
+        final List<TopicPartition> topicPartitions = kafka.partitionsFor(topicName)
                 .stream()
                 .map(partitionInfo -> new TopicPartition(topicName, partitionInfo.partition()))
                 .collect(Collectors.toList());
-        kafkaConsumer.assign(topicPartitions);
+        kafka.assign(topicPartitions);
 
         final Map<TopicPartition, Long> request = new HashMap<>();
         topicPartitions.forEach(partition -> request.put(partition, timestamp));
-        kafkaConsumer.offsetsForTimes(request).entrySet().stream()
+        kafka.offsetsForTimes(request).entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
-                .forEach(entry -> kafkaConsumer.seek(
+                .forEach(entry -> kafka.seek(
                         entry.getKey(), entry.getValue().offset()));
     }
 
     private class ConsumedItem {
-        private final ConsumerRecord<Integer, byte[]> consumerRecord;
         private final LogEvent logEvent;
 
         ConsumedItem(ConsumerRecord<Integer, byte[]> consumerRecord) {
-            this.consumerRecord = consumerRecord;
             this.logEvent = toLogEvent(consumerRecord);
         }
 

@@ -5,6 +5,9 @@
 
 package dk.dbc.kafka;
 
+import dk.dbc.kafka.consumer.Consumer;
+import dk.dbc.kafka.consumer.FileConsumer;
+import dk.dbc.kafka.consumer.KafkaConsumer;
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventFilter;
 import dk.dbc.kafka.logformat.LogEventFormatterJava;
@@ -36,16 +39,11 @@ public class LogTracerApp {
         final String format = cli.args.getString("format");
         final boolean follow = cli.args.getBoolean("follow");
 
-        final Consumer consumer = new Consumer(
-                cli.args.getString("broker"),
-                cli.args.getInt("port"),
-                cli.args.getString("topic"),
-                UUID.randomUUID().toString(),
-                cli.args.getString("offset"),
-                cli.args.getString("clientid"));
-
-        if (logEventFilter.getFrom() != null) {
-            consumer.setFromDateTime(logEventFilter.getFrom());
+        final Consumer consumer;
+        if (cli.args.get("from_file") != null) {
+            consumer = createFileConsumer(cli);
+        } else {
+            consumer = createKafkaConsumer(cli, logEventFilter);
         }
 
         final Iterator<LogEvent> iterator = consumer.iterator();
@@ -60,6 +58,10 @@ public class LogTracerApp {
                         case "JAVA":
                             System.out.println(
                                     LogEventFormatterJava.of(logEvent));
+                            break;
+                        case "SORTABLE":
+                            System.out.println(logEvent.getTimestamp().toInstant().toEpochMilli()
+                                    + " " + new String(logEvent.getRaw(), StandardCharsets.UTF_8));
                             break;
                         default:
                             System.out.println(new String(
@@ -107,5 +109,25 @@ public class LogTracerApp {
         }
 
         return logEventFilter;
+    }
+
+    private static Consumer createKafkaConsumer(Cli cli, LogEventFilter filter) {
+        final KafkaConsumer consumer = new KafkaConsumer(
+                cli.args.getString("broker"),
+                cli.args.getInt("port"),
+                cli.args.getString("topic"),
+                UUID.randomUUID().toString(),
+                cli.args.getString("offset"),
+                cli.args.getString("clientid"));
+
+        if (filter.getFrom() != null) {
+            consumer.setFromDateTime(filter.getFrom());
+        }
+        
+        return consumer;
+    }
+
+    private static Consumer createFileConsumer(Cli cli) {
+        return new FileConsumer(cli.args.getString("from_file"));
     }
 }
