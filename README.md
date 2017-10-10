@@ -9,7 +9,7 @@ Log-tracer is a commandline-tool for developers who wants to extract logs from o
 # installation
  
 ```bash
-$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.3/log-tracer" | bash
+$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.4/install.sh" | bash
 ```
 
 Optionally define the LOG_TRACER_OPTS environment variable for frequently used options

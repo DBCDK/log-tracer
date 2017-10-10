@@ -9,7 +9,14 @@ log_tracer_archive="${log_tracer_home}/archive"
 log_tracer_bin="${log_tracer_home}/bin"
 
 case "$1" in
+    -h)
+    echo "usage: log-tracer selfupdate"
+    echo "or"
+    java -jar ${log_tracer_archive}/log-tracer-current.jar -h
+    ;;
     selfupdate)
+    tag=`curl -sL https://api.github.com/repos/DBCDK/log-tracer/releases/latest | jq -r ".tag_name"`
+    curl -sL https://github.com/DBCDK/log-tracer/releases/download/${tag}/install.sh -o ${log_tracer_bin}/install.sh
     ${log_tracer_bin}/install.sh
     ;;
     *)
