@@ -11,6 +11,7 @@ import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.text.ParseException;
@@ -23,15 +24,17 @@ public class Cli {
 
     public Cli(String[] args) throws CliException {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("log-tracer");
-        parser.addArgument("-b", "--broker")
-                .required(true)
+        final MutuallyExclusiveGroup source = parser.addMutuallyExclusiveGroup()
+                .required(true);
+        source.addArgument("--from-file")
+                .help("Input file containing either RAW or SORTABLE format");
+        source.addArgument("-b", "--broker")
                 .help("Kafka host");
         parser.addArgument("-p", "--port")
-                .required(true)
                 .type(Integer.class)
+                .setDefault(9092)
                 .help("Kafka port");
         parser.addArgument("-t", "--topic")
-                .required(true)
                 .help("Kafka topic to consume");
         parser.addArgument("-o", "--offset")
                 .choices("earliest", "latest")
@@ -52,7 +55,7 @@ public class Cli {
                 .choices("ERROR", "WARN", "INFO", "DEBUG", "TRACE")
                 .help("Log level filter, get only level and above");
         parser.addArgument("--format")
-                .choices("RAW", "JAVA")
+                .choices("RAW", "SORTABLE", "JAVA")
                 .setDefault("RAW")
                 .help("Output format");
         parser.addArgument("-f", "--follow")
@@ -67,6 +70,9 @@ public class Cli {
 
         try {
             this.args = parser.parseArgs(args);
+            if (this.args.get("broker") != null && this.args.get("topic") == null) {
+                throw new ArgumentParserException("topic must be specified", parser);
+            }
         } catch (ArgumentParserException e) {
             parser.handleError(e);
             throw new CliException(e);
