@@ -7,22 +7,22 @@ Log-tracer is a commandline-tool for developers who wants to extract logs from o
 
 
 # installation
- You need to have Java JDK and the build tool Apache Maven
+ 
 ```bash
-$ mvn install
+$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.3/log-tracer" | bash
+```
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic test
+Optionally define the LOG_TRACER_OPTS environment variable for frequently used options
 
-or via maven the build tool.
-
-$ mvn exec:java -Dexec.mainClass='dk.dbc.kafka.LogTracerApp' -Dexec.arguments="--broker=localhost,--port=9092,--topic=test"
+```bash
+LOG_TRACER_OPTS="--broker localhost --port 9092"
 ```
 
 # usage 
 Log-tracer is a commandline tool and needs parameters related to the Kafka instance and optional parameters if filtering is needed. 
 ```bash
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar -h
+$ log-tracer -h
 usage: log-tracer [-h] -b BROKER -p PORT -t TOPIC [-o {earliest,latest}] [-c CLIENTID] [--log-env LOG_ENV] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,JAVA}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL]
 
 optional arguments:
@@ -51,15 +51,15 @@ optional arguments:
 # filtering
 Note that you are able to filter the log-events
 ```bash
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-env dev
+$ log-tracer --broker localhost --port 9092 --topic testtopic --log-env dev
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-host mesos-node-1 --log-host mesos-node-2
+$ log-tracer --broker localhost --port 9092 --topic testtopic --log-host mesos-node-1 --log-host mesos-node-2
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-appid dashing-database --log-appid dashing-webapp
+$ log-tracer --broker localhost --port 9092 --topic testtopic --log-appid dashing-database --log-appid dashing-webapp
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-from 2017-01-06T15:05 --log-until 2017-01-06T15:06
+$ log-tracer --broker localhost --port 9092 --topic testtopic --log-from 2017-01-06T15:05 --log-until 2017-01-06T15:06
 
-$ java -jar target/log-tracer-0.1-SNAPSHOT-jar-with-dependencies.jar --broker localhost --port 9092 --topic testtopic --log-level ERROR
+$ log-tracer --broker localhost --port 9092 --topic testtopic --log-level ERROR
 
 
 ```
