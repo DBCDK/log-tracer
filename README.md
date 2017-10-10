@@ -12,8 +12,12 @@ Log-tracer is a commandline-tool for developers who wants to extract logs from o
 $ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.4/install.sh" | bash
 ```
 
-Optionally define the LOG_TRACER_OPTS environment variable for frequently used options
+Keep the installation up-to-date using the selfupdate action
+```bash
+log-tracer selfupdate
+```
 
+Optionally define the LOG_TRACER_OPTS environment variable for frequently used options
 ```bash
 LOG_TRACER_OPTS="--broker localhost --port 9092"
 ```
@@ -23,6 +27,8 @@ Log-tracer is a commandline tool and needs parameters related to the Kafka insta
 ```bash
 
 $ log-tracer -h
+usage: log-tracer selfupdate
+or
 usage: log-tracer [-h] -b BROKER -p PORT -t TOPIC [-o {earliest,latest}] [-c CLIENTID] [--log-env LOG_ENV] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,JAVA}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL]
 
 optional arguments:
