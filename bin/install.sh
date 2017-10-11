@@ -57,12 +57,15 @@ mkdir -pv "$log_tracer_bin"
 
 echo "Fetching artifacts..."
 tag=`curl -sL https://api.github.com/repos/DBCDK/log-tracer/releases/latest | jq -r ".tag_name"`
-curl -sL https://github.com/DBCDK/log-tracer/releases/download/${tag}/log-tracer.jar -o ${log_tracer_archive}/log-tracer-${tag}.jar
 curl -sL https://github.com/DBCDK/log-tracer/releases/download/${tag}/install.sh -o ${log_tracer_bin}/install.sh
 curl -sL https://github.com/DBCDK/log-tracer/releases/download/${tag}/log-tracer -o ${log_tracer_bin}/log-tracer
+curl -sL https://github.com/DBCDK/log-tracer/releases/download/${tag}/log-tracer.jar -o ${log_tracer_archive}/log-tracer-${tag}.jar
 
-[ -e ${log_tracer_archive}/log-tracer-current.jar ] && rm ${log_tracer_archive}/log-tracer-current.jar
-ln -s ${log_tracer_archive}/log-tracer-${tag}.jar  ${log_tracer_archive}/log-tracer-current.jar
+if [ $? -eq 0 ]; then
+    [ -e ${log_tracer_archive}/log-tracer-current.jar ] && rm ${log_tracer_archive}/log-tracer-current.jar
+    ln -s ${log_tracer_archive}/log-tracer-${tag}.jar  ${log_tracer_archive}/log-tracer-current.jar
+    echo ${tag} > ${log_tracer_home}/version
+fi
 chmod a+x ${log_tracer_bin}/install.sh
 chmod a+x ${log_tracer_bin}/log-tracer
 

@@ -11,9 +11,10 @@ import dk.dbc.kafka.consumer.KafkaConsumer;
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventFilter;
 import dk.dbc.kafka.logformat.LogEventFormatterJava;
+import dk.dbc.kafka.logformat.LogEventFormatterRaw;
+import dk.dbc.kafka.logformat.LogEventFormatterSortable;
 import org.slf4j.event.Level;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
@@ -60,12 +61,12 @@ public class LogTracerApp {
                                     LogEventFormatterJava.of(logEvent));
                             break;
                         case "SORTABLE":
-                            System.out.println(logEvent.getTimestamp().toInstant().toEpochMilli()
-                                    + " " + new String(logEvent.getRaw(), StandardCharsets.UTF_8));
+                            System.out.println(
+                                    LogEventFormatterSortable.of(logEvent));
                             break;
-                        default:
-                            System.out.println(new String(
-                                    logEvent.getRaw(), StandardCharsets.UTF_8));
+                        default: // RAW
+                            System.out.println(
+                                    LogEventFormatterRaw.of(logEvent));
                     }
                 }
             }

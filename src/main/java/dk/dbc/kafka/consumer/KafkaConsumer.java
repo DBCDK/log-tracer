@@ -50,11 +50,11 @@ public class KafkaConsumer implements Consumer {
             }
             
             final PriorityQueue<ConsumedItem> consumedItems =
-                    new PriorityQueue<>(3000, new ConsumedItemComparator());
+                    new PriorityQueue<>(1200, new ConsumedItemComparator());
 
             @Override
             public boolean hasNext() {
-                if (consumedItems.isEmpty() || consumedItems.size() < 1000) {
+                if (consumedItems.isEmpty() || consumedItems.size() < 400) {
                     kafka.poll(3000).forEach(record
                             -> consumedItems.add(new ConsumedItem(record)));
                 }
@@ -76,7 +76,7 @@ public class KafkaConsumer implements Consumer {
         properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.IntegerDeserializer");
         properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         properties.put("auto.offset.reset", offset);  // The consumer can starts from the beginning of the topic or the end
-        properties.put("max.poll.records", "2000");
+        properties.put("max.poll.records", "800");
         return properties;
     }
 
