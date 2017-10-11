@@ -19,12 +19,12 @@ hours
 # installation
  
 ```bash
-$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.5/install.sh" | bash
+$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.6/install.sh" | bash
 ```
 
 Keep the installation up-to-date using the selfupdate action
 ```bash
-log-tracer selfupdate
+log-tracer --selfupdate
 ```
 
 Optionally define the LOG_TRACER_OPTS environment variable for frequently used
@@ -39,8 +39,8 @@ instance and optional parameters if filtering is needed.
 ```bash
 
 $ log-tracer -h
-usage: log-tracer selfupdate
-or
+usage: log-tracer --version
+usage: log-tracer --selfupdate
 usage: log-tracer [-h] [-p PORT] [-t TOPIC] [-o {earliest,latest}] [-c CLIENTID] [--log-env LOG_ENV] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,SORTABLE,JAVA}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL] (--from-file FROM_FILE | -b BROKER)
 
 optional arguments:
