@@ -24,7 +24,7 @@ public class FileConsumer implements Consumer {
 
     public FileConsumer(String file) {
         this.file = Paths.get(file);
-        if (!Files.exists(this.file)) {
+        if (!file.equals("-") && !Files.exists(this.file)) {
             throw new IllegalArgumentException("File does not exist: " + file);
         }
         this.logEventMapper = new LogEventMapper();
@@ -71,6 +71,10 @@ public class FileConsumer implements Consumer {
 
             private BufferedReader createBufferedReader(Path file) {
                 try {
+                    if(file.toString().equals("-")) {
+                        return new BufferedReader(new InputStreamReader(
+                            System.in, StandardCharsets.UTF_8));
+                    }
                     return new BufferedReader(
                             new InputStreamReader(
                                     Files.newInputStream(file), StandardCharsets.UTF_8));
