@@ -14,6 +14,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 
 public class LogEventMapper {
     private final ObjectMapper objectMapper;
@@ -40,7 +41,9 @@ public class LogEventMapper {
         try {
             return objectMapper.readValue(json, LogEvent.class);
         } catch (IOException e) {
-            throw new UncheckedIOException("Exception caught when trying to unmarshall JSON to LogEvent object", e);
+            final LogEvent logEvent = new LogEvent();
+            logEvent.setMessage(new String(json, StandardCharsets.UTF_8));
+            return logEvent;
         }
     }
 }
