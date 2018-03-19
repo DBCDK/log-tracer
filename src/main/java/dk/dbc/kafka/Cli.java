@@ -55,9 +55,11 @@ public class Cli {
                 .choices("ERROR", "WARN", "INFO", "DEBUG", "TRACE")
                 .help("Log level filter, get only level and above");
         parser.addArgument("--format")
-                .choices("RAW", "SORTABLE", "JAVA")
                 .setDefault("RAW")
-                .help("Output format");
+                .help("Output format, {RAW, SORTABLE, JAVA, CUSTOM}\n" +
+                    "CUSTOM is a user-defined format where keys to look for " +
+                    "in the log json can be specified with %(key).\n" +
+                    "ex: --format \"[%(level)] %(message)\")");
         parser.addArgument("-f", "--follow")
                 .action(Arguments.storeTrue())
                 .help("Consume log events continuously");

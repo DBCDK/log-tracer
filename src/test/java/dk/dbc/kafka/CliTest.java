@@ -111,16 +111,6 @@ public class CliTest {
     }
 
     @Test(expected = CliException.class)
-    public void badFormatChoice() {
-        final String[] args = new String[3];
-        args[0] = "--broker=" + "localhost";
-        args[1] = "--topic=" + "test-topic";
-        args[2] = "--format=" + "XML";
-
-        new Cli(args);
-    }
-
-    @Test(expected = CliException.class)
     public void badOffsetChoice() {
         final String[] args = new String[3];
         args[0] = "--broker=" + "localhost";

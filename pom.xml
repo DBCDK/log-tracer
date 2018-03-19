@@ -13,6 +13,7 @@
   <url>https://github.com/DBCDK/log-tracer/</url>
   <properties>
     <kafka.version>0.10.1.0</kafka.version>
+    <apache.commons-text.version>1.2</apache.commons-text.version>
   </properties>
 
   <dependencies>
@@ -63,6 +64,12 @@
           <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <version>${apache.commons-text.version}</version>
     </dependency>
 
     <dependency>

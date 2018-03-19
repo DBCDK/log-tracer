@@ -10,6 +10,7 @@ import dk.dbc.kafka.consumer.FileConsumer;
 import dk.dbc.kafka.consumer.KafkaConsumer;
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventFilter;
+import dk.dbc.kafka.logformat.LogEventFormaterCustom;
 import dk.dbc.kafka.logformat.LogEventFormatterJava;
 import dk.dbc.kafka.logformat.LogEventFormatterRaw;
 import dk.dbc.kafka.logformat.LogEventFormatterSortable;
@@ -64,9 +65,14 @@ public class LogTracerApp {
                             System.out.println(
                                     LogEventFormatterSortable.of(logEvent));
                             break;
-                        default: // RAW
+                        case "RAW":
                             System.out.println(
                                     LogEventFormatterRaw.of(logEvent));
+                            break;
+                        default:
+                            System.out.println(LogEventFormaterCustom.of(format,
+                                logEvent));
+                            break;
                     }
                 }
             }
