@@ -8,7 +8,7 @@
   <groupId>dk.dbc.kafka</groupId>
   <artifactId>log-tracer</artifactId>
   <packaging>jar</packaging>
-  <version>0.7</version>
+  <version>0.9</version>
   <name>log-tracer</name>
   <url>https://github.com/DBCDK/log-tracer/</url>
   <properties>

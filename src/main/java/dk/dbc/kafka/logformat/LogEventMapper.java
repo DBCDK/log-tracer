@@ -39,9 +39,10 @@ public class LogEventMapper {
 
     public LogEvent unmarshall(byte[] json) {
         try {
-            final LogEvent logEvent = objectMapper.readValue(json,
-                LogEvent.class);
-            logEvent.setRaw(json);
+            final LogEvent logEvent = objectMapper.readValue(json, LogEvent.class);
+            if (logEvent != null) {
+                logEvent.setRaw(json);
+            }
             return logEvent;
         } catch (IOException e) {
             final LogEvent logEvent = new LogEvent();
