@@ -19,7 +19,7 @@ hours
 # installation
  
 ```bash
-$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.6/install.sh" | bash
+$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.9/install.sh" | bash
 ```
 
 Keep the installation up-to-date using the selfupdate action
