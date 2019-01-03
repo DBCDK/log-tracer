@@ -55,18 +55,20 @@ public class FileConsumer implements Consumer {
             public LogEvent next() {
                 try {
                     final String line = reader.readLine();
-                    try {
-                        if (line.startsWith("{")) { // assume RAW format
+                    if (line != null) {
+                        try {
+                            if (line.startsWith("{")) { // assume RAW format
+                                return logEventMapper.unmarshall(line.getBytes(StandardCharsets.UTF_8));
+                            }
+                            final String[] parts = line.split("\\s", 2);
+                            if (parts.length == 2) { // assume SORTABLE format
+                                return logEventMapper.unmarshall(parts[1].getBytes(StandardCharsets.UTF_8));
+                            }
+                            // This is probably doomed to fail...
                             return logEventMapper.unmarshall(line.getBytes(StandardCharsets.UTF_8));
+                        } catch (UncheckedIOException e) {
+                            System.out.println(line);
                         }
-                        final String[] parts = line.split("\\s", 2);
-                        if (parts.length == 2) { // assume SORTABLE format
-                            return logEventMapper.unmarshall(parts[1].getBytes(StandardCharsets.UTF_8));
-                        }
-                        // This is probably doomed to fail...
-                        return logEventMapper.unmarshall(line.getBytes(StandardCharsets.UTF_8));
-                    } catch (UncheckedIOException e) {
-                        System.out.println(line);
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
