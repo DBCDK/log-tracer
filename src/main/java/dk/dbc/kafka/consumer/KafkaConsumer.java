@@ -11,6 +11,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 
 import java.io.UncheckedIOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -43,7 +44,7 @@ public class KafkaConsumer implements Consumer {
     @Override
     public Iterator<LogEvent> iterator() {
         return new Iterator<LogEvent>() {
-            final org.apache.kafka.clients.consumer.KafkaConsumer<Integer, byte[]> kafka =
+            final org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka =
                     new org.apache.kafka.clients.consumer.KafkaConsumer<>(kafkaProperties);
             {
                 subscribe(kafka, topicName, timestamp);
@@ -55,7 +56,7 @@ public class KafkaConsumer implements Consumer {
             @Override
             public boolean hasNext() {
                 if (consumedItems.isEmpty() || consumedItems.size() < 400) {
-                    kafka.poll(3000).forEach(record
+                    kafka.poll(Duration.ofMillis(3000)).forEach(record
                             -> consumedItems.add(new ConsumedItem(record)));
                 }
                 return !consumedItems.isEmpty();
@@ -73,7 +74,7 @@ public class KafkaConsumer implements Consumer {
         properties.setProperty("bootstrap.servers", hostname + ":" + port);
         properties.setProperty("group.id", groupId);
         properties.setProperty("client.id", clientID); // UUID.randomUUID().toString()
-        properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.IntegerDeserializer");
+        properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         properties.put("auto.offset.reset", offset);  // The consumer can starts from the beginning of the topic or the end
         properties.put("max.poll.records", "800");
@@ -81,7 +82,7 @@ public class KafkaConsumer implements Consumer {
     }
 
     private void subscribe(
-            org.apache.kafka.clients.consumer.KafkaConsumer<Integer, byte[]> kafka,
+            org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
             String topicName, long timestamp) {
         if (timestamp > 0) {
             seekToOffsetsForTimestamp(kafka, topicName, timestamp);
@@ -91,7 +92,7 @@ public class KafkaConsumer implements Consumer {
     }
 
     private void seekToOffsetsForTimestamp(
-            org.apache.kafka.clients.consumer.KafkaConsumer<Integer, byte[]> kafka,
+            org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
             String topicName, long timestamp) {
         final List<TopicPartition> topicPartitions = kafka.partitionsFor(topicName)
                 .stream()
@@ -110,11 +111,11 @@ public class KafkaConsumer implements Consumer {
     private class ConsumedItem {
         private final LogEvent logEvent;
 
-        ConsumedItem(ConsumerRecord<Integer, byte[]> consumerRecord) {
+        ConsumedItem(ConsumerRecord<String, byte[]> consumerRecord) {
             this.logEvent = toLogEvent(consumerRecord);
         }
 
-        private LogEvent toLogEvent(ConsumerRecord<Integer, byte[]> consumerRecord) {
+        private LogEvent toLogEvent(ConsumerRecord<String, byte[]> consumerRecord) {
             LogEvent logEvent;
             try {
                 logEvent = logEventMapper.unmarshall(consumerRecord.value());

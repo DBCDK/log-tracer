@@ -12,7 +12,7 @@
   <name>log-tracer</name>
   <url>https://github.com/DBCDK/log-tracer/</url>
   <properties>
-    <kafka.version>0.10.1.0</kafka.version>
+    <kafka.version>2.2.0</kafka.version>
     <apache.commons-text.version>1.6</apache.commons-text.version>
     <mockito.version>2.18.3</mockito.version>
   </properties>
