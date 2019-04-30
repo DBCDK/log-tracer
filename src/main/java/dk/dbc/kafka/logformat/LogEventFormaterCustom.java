@@ -34,6 +34,8 @@ public class LogEventFormaterCustom {
         // change prefix and suffix from default values to avoid clashing
         // with shell variable expansion
         final StringSubstitutor substitutor = new StringSubstitutor(map, "%(", ")");
+        substitutor.setVariableResolver(
+            new EmptyDefaultVariableResolver(map));
         return substitutor.replace(format);
     }
 }
