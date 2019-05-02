@@ -3,7 +3,7 @@ package dk.dbc.kafka.logformat;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import org.apache.commons.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +33,9 @@ public class LogEventFormaterCustom {
         }
         // change prefix and suffix from default values to avoid clashing
         // with shell variable expansion
-        final StrSubstitutor substitutor = new StrSubstitutor(map, "%(", ")");
+        final StringSubstitutor substitutor = new StringSubstitutor(map, "%(", ")");
+        substitutor.setVariableResolver(
+            new EmptyDefaultVariableResolver(map));
         return substitutor.replace(format);
     }
 }
