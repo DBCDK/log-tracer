@@ -20,7 +20,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.utils.Time;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -28,6 +27,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.UUID;
@@ -35,7 +38,6 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-@Ignore
 public class KafkaConsumerTest {
     private static final String ZKHOST = "127.0.0.1";
     private static final String BROKERHOST = "127.0.0.1";
@@ -87,7 +89,9 @@ public class KafkaConsumerTest {
         produceLogEvents();
 
         final KafkaConsumer consumer = new KafkaConsumer(BROKERHOST, BROKERPORT, TOPIC, UUID.randomUUID().toString(),
-                "earliest", "new-test");
+                "latest", "new-test");
+        consumer.setFromDateTime(OffsetDateTime.ofInstant(
+                Instant.now().minus(1, ChronoUnit.DAYS), ZoneId.systemDefault()));
         int eventCount = 0;
         for (LogEvent event : consumer) {
             eventCount++;

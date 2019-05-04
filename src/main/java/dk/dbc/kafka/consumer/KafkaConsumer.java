@@ -8,6 +8,8 @@ package dk.dbc.kafka.consumer;
 import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.OffsetAndTimestamp;
+import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 
 import java.io.UncheckedIOException;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class KafkaConsumer implements Consumer {
     private final Properties kafkaProperties;
@@ -94,18 +95,22 @@ public class KafkaConsumer implements Consumer {
     private void seekToOffsetsForTimestamp(
             org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
             String topicName, long timestamp) {
-        final List<TopicPartition> topicPartitions = kafka.partitionsFor(topicName)
-                .stream()
-                .map(partitionInfo -> new TopicPartition(topicName, partitionInfo.partition()))
-                .collect(Collectors.toList());
-        kafka.assign(topicPartitions);
 
-        final Map<TopicPartition, Long> request = new HashMap<>();
-        topicPartitions.forEach(partition -> request.put(partition, timestamp));
-        kafka.offsetsForTimes(request).entrySet().stream()
-                .filter(entry -> entry.getValue() != null)
-                .forEach(entry -> kafka.seek(
-                        entry.getKey(), entry.getValue().offset()));
+        final Map<TopicPartition, Long> startingPointByTimestamp = new HashMap<>();
+        final List<PartitionInfo> topicPartitionInfo = kafka.partitionsFor(topicName);
+        for (PartitionInfo pi : topicPartitionInfo) {
+            startingPointByTimestamp.put(new TopicPartition(topicName, pi.partition()), timestamp);
+        }
+        System.err.println("partitions and timestamps: " + startingPointByTimestamp);
+        final Map<TopicPartition, OffsetAndTimestamp> startingPointByOffset =
+                kafka.offsetsForTimes(startingPointByTimestamp);
+        System.err.println("partitions and offsets: " + startingPointByOffset);
+        kafka.assign(startingPointByOffset.keySet());
+        for (Map.Entry<TopicPartition, OffsetAndTimestamp> entry : startingPointByOffset.entrySet()) {
+            if (entry.getValue() != null) {
+                kafka.seek(entry.getKey(), entry.getValue().offset());
+            }
+        }
     }
 
     private class ConsumedItem {
