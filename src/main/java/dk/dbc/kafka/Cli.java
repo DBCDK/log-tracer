@@ -23,7 +23,7 @@ public class Cli {
     public Namespace args;
 
     public Cli(String[] args) throws CliException {
-        final ArgumentParser parser = ArgumentParsers.newArgumentParser("log-tracer");
+        final ArgumentParser parser = ArgumentParsers.newFor("log-tracer").build();
         final MutuallyExclusiveGroup source = parser.addMutuallyExclusiveGroup()
                 .required(true);
         source.addArgument("--from-file")
