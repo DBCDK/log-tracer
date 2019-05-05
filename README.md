@@ -114,4 +114,4 @@ $ log-tracer ... --from-file sorted.log
 
 # log format
 The optimal JSON message format for all log-events
-`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","host":"mesos-node-7","sys_appid":"any-application-with-modern-logging","level":"DEBUG","message":"the log message", "stack_trace": ""}`
+`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","sys_host":"cluster-node-7","sys_appid":"any-application-with-modern-logging","level":"DEBUG","message":"the log message", "stack_trace": ""}`
