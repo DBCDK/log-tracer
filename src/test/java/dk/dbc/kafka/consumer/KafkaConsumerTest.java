@@ -10,7 +10,6 @@ import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
-import kafka.utils.SystemTime$;
 import kafka.utils.TestUtils;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
@@ -18,6 +17,7 @@ import kafka.zk.EmbeddedZookeeper;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.utils.Time;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +27,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.UUID;
@@ -59,7 +63,7 @@ public class KafkaConsumerTest {
         brokerProps.setProperty("broker.id", "0");
         brokerProps.setProperty("log.dirs", Files.createTempDirectory("kafka-").toAbsolutePath().toString());
         brokerProps.setProperty("listeners", "PLAINTEXT://" + BROKERHOST +":" + BROKERPORT);
-        broker = TestUtils.createServer(new KafkaConfig(brokerProps), SystemTime$.MODULE$);
+        broker = TestUtils.createServer(new KafkaConfig(brokerProps), Time.SYSTEM);
 
         AdminUtils.createTopic(zkUtils, TOPIC, 1, 1, new Properties(), RackAwareMode.Disabled$.MODULE$);
 
@@ -85,7 +89,9 @@ public class KafkaConsumerTest {
         produceLogEvents();
 
         final KafkaConsumer consumer = new KafkaConsumer(BROKERHOST, BROKERPORT, TOPIC, UUID.randomUUID().toString(),
-                "earliest", "new-test");
+                "latest", "new-test");
+        consumer.setFromDateTime(OffsetDateTime.ofInstant(
+                Instant.now().minus(1, ChronoUnit.DAYS), ZoneId.systemDefault()));
         int eventCount = 0;
         for (LogEvent event : consumer) {
             eventCount++;
