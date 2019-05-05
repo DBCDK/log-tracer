@@ -43,8 +43,6 @@ public class Cli {
         parser.addArgument("-c", "--clientid")
                 .setDefault(UUID.randomUUID().toString())
                 .help("Provide a client ID to identify the client and make use of Kafkas built in offset");
-        parser.addArgument("--log-env")
-                .help("Log environment filter, ex. prod or staging");
         parser.addArgument("--log-host")
                 .action(Arguments.append())
                 .help("Log hostname filter, repeatable");

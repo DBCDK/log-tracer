@@ -67,18 +67,6 @@ public class LogEventFilterTest {
     }
 
     @Test
-    public void envFilter() {
-        final LogEventFilter logEventFilter = new LogEventFilter()
-                .setEnv("testEnv");
-        final LogEvent logEvent = new LogEvent();
-        assertThat("no env", logEventFilter.test(logEvent), is(false));
-        logEvent.setEnv("notTestEnv");
-        assertThat("no env match", logEventFilter.test(logEvent), is(false));
-        logEvent.setEnv("testEnv");
-        assertThat("env match", logEventFilter.test(logEvent), is(true));
-    }
-    
-    @Test
     public void hostFilter() {
         final Set<String> hosts = new HashSet<>();
         hosts.add("testHost");

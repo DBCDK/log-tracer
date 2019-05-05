@@ -42,7 +42,6 @@ public class LogEventMapperTest {
         final LogEvent logEvent = new LogEvent();
         logEvent.setAppID("UNIT-TEST");
         logEvent.setHost("localhost");
-        logEvent.setEnv("test");
         logEvent.setLevel(org.slf4j.event.Level.INFO);
         logEvent.setMessage("This is auto generated log message number " + id);
         logEvent.setTimestamp(OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()));

@@ -41,7 +41,7 @@ instance and optional parameters if filtering is needed.
 $ log-tracer -h
 usage: log-tracer --version
 usage: log-tracer --selfupdate
-usage: log-tracer [-h] [-p PORT] [-t TOPIC] [-o {earliest,latest}] [-c CLIENTID] [--log-env LOG_ENV] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,SORTABLE,JAVA}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL] (--from-file FROM_FILE | -b BROKER)
+usage: log-tracer [-h] [-p PORT] [-t TOPIC] [-o {earliest,latest}] [-c CLIENTID] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,SORTABLE,JAVA}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL] (--from-file FROM_FILE | -b BROKER)
 
 optional arguments:
   -h, --help             show this help message and exit
@@ -55,7 +55,6 @@ optional arguments:
                          Consume from the beginning or the end of the topic
   -c CLIENTID, --clientid CLIENTID
                          Provide a client ID to identify the client and make use of Kafkas built in offset
-  --log-env LOG_ENV      Log environment filter, ex. prod or staging
   --log-host LOG_HOST    Log hostname filter, repeatable
   --log-appid LOG_APPID  Log application ID filter, repeatable
   --log-level {ERROR,WARN,INFO,DEBUG,TRACE}
@@ -70,8 +69,6 @@ optional arguments:
 # filtering
 Note that you are able to filter the log-events
 ```bash
-$ log-tracer --broker localhost --port 9092 --topic testtopic --log-env dev
-
 $ log-tracer --broker localhost --port 9092 --topic testtopic --log-host mesos-node-1 --log-host mesos-node-2
 
 $ log-tracer --broker localhost --port 9092 --topic testtopic --log-appid dashing-database --log-appid dashing-webapp
@@ -117,4 +114,4 @@ $ log-tracer ... --from-file sorted.log
 
 # log format
 The optimal JSON message format for all log-events
-`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","host":"mesos-node-7","sys_appid":"any-application-with-modern-logging","level":"DEBUG","sys_env":"prod","message":"the log message", "stack_trace": ""}`
+`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","host":"mesos-node-7","sys_appid":"any-application-with-modern-logging","level":"DEBUG","message":"the log message", "stack_trace": ""}`
