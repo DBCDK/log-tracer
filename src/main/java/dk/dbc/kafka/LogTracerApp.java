@@ -98,10 +98,6 @@ public class LogTracerApp {
             logEventFilter.setUntil(cli.args.get("log_until"));
         }
 
-        if (cli.args.get("log_env") != null) {
-            logEventFilter.setEnv(cli.args.getString("log_env"));
-        }
-
         if (cli.args.get("log_host") != null) {
             logEventFilter.setHosts(new HashSet<>(cli.args.getList("log_host")));
         }

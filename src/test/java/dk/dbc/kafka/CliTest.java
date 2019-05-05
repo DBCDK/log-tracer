@@ -22,23 +22,23 @@ public class CliTest {
     public void cli() throws ParseException {
         final SimpleDateFormat timestampFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
 
-        final String[] args = new String[14];
+        final String[] args = new String[13];
         args[0] = "--broker=" + "localhost";
         args[1] = "--port=" + "9093";
         args[2] = "--topic=" + "test-topic";
         args[3] = "--log-from=" + "2016-12-24T11:00";
         args[4] = "--log-until=" + "2016-12-24T12:00";
-        args[5] = "--log-env=" + "env";
-        args[6] = "--log-host=" + "host1";
-        args[7] = "--log-host=" + "host2";
-        args[8] = "--log-appid=" + "appId1";
-        args[9] = "--log-appid=" + "appId2";
-        args[10] = "--clientid=" + "myId";
-        args[11] = "--offset=" + "earliest";
-        args[12] = "--format=" + "JAVA";
-        args[13] = "--follow";
+        args[5] = "--log-host=" + "host1";
+        args[6] = "--log-host=" + "host2";
+        args[7] = "--log-appid=" + "appId1";
+        args[8] = "--log-appid=" + "appId2";
+        args[9] = "--clientid=" + "myId";
+        args[10] = "--offset=" + "earliest";
+        args[11] = "--format=" + "JAVA";
+        args[12] = "--follow";
 
         final Cli cli = new Cli(args);
+
 
         assertThat("broker", cli.args.getString("broker"), is("localhost"));
         assertThat("port", cli.args.getInt("port"), is(9093));
@@ -49,7 +49,6 @@ public class CliTest {
         assertThat("log-until", cli.args.get("log_until"), is(notNullValue()));
         assertThat("log-until", cli.args.get("log_until"),
                 is(timestampFormat.parse("2016-12-24T12:00")));
-        assertThat("log-env", cli.args.getString("log_env"), is("env"));
         assertThat("log-host", cli.args.getList("log_host"), is(Arrays.asList("host1", "host2")));
         assertThat("log-appid", cli.args.getList("log_appid"), is(Arrays.asList("appId1", "appId2")));
         assertThat("clientid", cli.args.getString("clientid"), is("myId"));

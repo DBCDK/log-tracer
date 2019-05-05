@@ -17,7 +17,6 @@ public class LogEventFilter implements Predicate<LogEvent> {
     private OffsetDateTime from, until;
     private Set<String> appIDs;
     private Set<String> hosts;
-    private String env;
     private Level loglevel;
     private int numberOfExitEvents;
 
@@ -42,11 +41,6 @@ public class LogEventFilter implements Predicate<LogEvent> {
 
     public LogEventFilter setHosts(Set<String> hosts) {
         this.hosts = hosts;
-        return this;
-    }
-
-    public LogEventFilter setEnv(String env) {
-        this.env = env;
         return this;
     }
 
@@ -76,10 +70,6 @@ public class LogEventFilter implements Predicate<LogEvent> {
             allowed = false;
         }
 
-        if (env != null && !env.isEmpty() && !env.equalsIgnoreCase(logEvent.getEnv())) {
-            allowed = false;
-        }
-
         if (hosts != null && !hosts.contains(logEvent.getHost())) {
             allowed = false;
         }
@@ -98,7 +88,6 @@ public class LogEventFilter implements Predicate<LogEvent> {
                 ", until=" + until +
                 ", appIDs=" + appIDs +
                 ", hosts=" + hosts +
-                ", env='" + env + '\'' +
                 ", loglevel=" + loglevel +
                 '}';
     }

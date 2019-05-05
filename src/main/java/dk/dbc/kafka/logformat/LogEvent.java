@@ -16,8 +16,6 @@ import java.util.Map;
 public class LogEvent {
     private OffsetDateTime timestamp;
     private String host;
-    @JsonProperty("sys_env")
-    private String env;
     @JsonProperty("sys_team")
     private String team;
     @JsonProperty("sys_appid")
@@ -110,14 +108,6 @@ public class LogEvent {
         this.mdc = mdc;
     }
 
-    public String getEnv() {
-        return env;
-    }
-
-    public void setEnv(String env) {
-        this.env = env;
-    }
-
     public String getTeam() {
         return team;
     }
@@ -175,9 +165,6 @@ public class LogEvent {
         if (host != null ? !host.equals(logEvent.host) : logEvent.host != null) {
             return false;
         }
-        if (env != null ? !env.equals(logEvent.env) : logEvent.env != null) {
-            return false;
-        }
         if (team != null ? !team.equals(logEvent.team) : logEvent.team != null) {
             return false;
         }
@@ -215,7 +202,6 @@ public class LogEvent {
     public int hashCode() {
         int result = timestamp != null ? timestamp.hashCode() : 0;
         result = 31 * result + (host != null ? host.hashCode() : 0);
-        result = 31 * result + (env != null ? env.hashCode() : 0);
         result = 31 * result + (team != null ? team.hashCode() : 0);
         result = 31 * result + (appID != null ? appID.hashCode() : 0);
         result = 31 * result + (taskId != null ? taskId.hashCode() : 0);
@@ -235,7 +221,6 @@ public class LogEvent {
         return "LogEvent{" +
                 "timestamp=" + timestamp +
                 ", host='" + host + '\'' +
-                ", env='" + env + '\'' +
                 ", team='" + team + '\'' +
                 ", appID='" + appID + '\'' +
                 ", taskId='" + taskId + '\'' +
