@@ -15,6 +15,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LogEvent {
     private OffsetDateTime timestamp;
+    @JsonProperty("sys_host")
     private String host;
     @JsonProperty("sys_team")
     private String team;
