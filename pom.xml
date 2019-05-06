@@ -20,6 +20,14 @@
     <slf4j.version>1.7.26</slf4j.version>
   </properties>
 
+  <distributionManagement>
+    <repository>
+      <id>mavenrepo.dbc.dk</id>
+      <name>DBC internal maven repository</name>
+      <url>http://mavenrepo.dbc.dk/content/repositories/releases</url>
+    </repository>
+  </distributionManagement>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -143,7 +151,7 @@
           </execution>
         </executions>
         <configuration>
-          <finalName>log-tracer</finalName>
+          <finalName>log-tracer-${project.version}</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <archive>
             <manifest>
