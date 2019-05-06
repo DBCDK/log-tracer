@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/DBCDK/log-tracer.svg?branch=master)](https://travis-ci.org/DBCDK/log-tracer)
 # log-tracer
 Log-tracer is a commandline-tool for developers who wants to extract logs from
 one or more containers, applications or nodes for a given period, log-level, 
@@ -19,7 +18,7 @@ hours
 # installation
  
 ```bash
-$ curl -Ls "https://github.com/DBCDK/log-tracer/releases/download/0.9/install.sh" | bash
+curl -sL http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer/1.0/log-tracer-1.0.jar -o log-tracer-1.0.jar && unzip -op log-tracer-1.0.jar log-tracer | bash -s -- --install
 ```
 
 Keep the installation up-to-date using the selfupdate action
