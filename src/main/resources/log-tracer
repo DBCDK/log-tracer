@@ -4,15 +4,15 @@
 # See license text in LICENSE.md
 #
 
-log-tracer_home="$HOME/.log-tracer"
-log-tracer_archive="${log-tracer_home}/archive"
-log-tracer_bin="${log-tracer_home}/bin"
-log-tracer_url=http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/log-tracer
+log_tracer_home="$HOME/.log-tracer"
+log_tracer_archive="${log_tracer_home}/archive"
+log_tracer_bin="${log_tracer_home}/bin"
+log_tracer_url=http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer
 
 function get_current_version {
     local current_version
-    if [ -f ${log-tracer_home}/version ]; then
-        current_version=`cat ${log-tracer_home}/version`
+    if [ -f ${log_tracer_home}/version ]; then
+        current_version=`cat ${log_tracer_home}/version`
     else
         current_version=0
     fi
@@ -21,7 +21,7 @@ function get_current_version {
 
 function get_latest_version {
     local latest_version=`
-        curl -s "${log-tracer_url}/maven-metadata.xml" | \
+        curl -s "${log_tracer_url}/maven-metadata.xml" | \
         grep "<release>.*</release>" | \
         sed -e "s#\(.*\)\(<release>\)\(.*\)\(</release>\)\(.*\)#\3#g"`
     echo ${latest_version}
@@ -64,21 +64,21 @@ function install {
         exit 1
     fi
 
-    mkdir -pv "$log-tracer_archive"
-    mkdir -pv "$log-tracer_bin"
+    mkdir -pv "$log_tracer_archive"
+    mkdir -pv "$log_tracer_bin"
 
     local current_version=`get_current_version`
     local latest_version=`get_latest_version`
 
     if [ "$current_version" != "$latest_version" ]; then
         echo "Installing version ${latest_version}"
-        curl -sL ${log-tracer_url}/${latest_version}/log-tracer-${latest_version}.jar -o ${log-tracer_archive}/log-tracer-${latest_version}.jar
+        curl -sL ${log_tracer_url}/${latest_version}/log-tracer-${latest_version}.jar -o ${log_tracer_archive}/log-tracer-${latest_version}.jar
         if [ $? -eq 0 ]; then
-            [ -e ${log-tracer_archive}/log-tracer-current.jar ] && rm ${log-tracer_archive}/log-tracer-current.jar
-            ln -s ${log-tracer_archive}/log-tracer-${latest_version}.jar ${log-tracer_archive}/log-tracer-current.jar
-            unzip -o ${log-tracer_archive}/log-tracer-current.jar log-tracer -d ${log-tracer_bin}
-            chmod a+x ${log-tracer_bin}/log-tracer
-            echo ${latest_version} > ${log-tracer_home}/version
+            [ -e ${log_tracer_archive}/log-tracer-current.jar ] && rm ${log_tracer_archive}/log-tracer-current.jar
+            ln -s ${log_tracer_archive}/log-tracer-${latest_version}.jar ${log_tracer_archive}/log-tracer-current.jar
+            unzip -o ${log_tracer_archive}/log-tracer-current.jar log-tracer -d ${log_tracer_bin}
+            chmod a+x ${log_tracer_bin}/log-tracer
+            echo ${latest_version} > ${log_tracer_home}/version
         fi
 
         if [ ! -f ~/.bash_aliases ]; then
@@ -96,7 +96,7 @@ function selfupdate {
     local current_version=`get_current_version`
     local latest_version=`get_latest_version`
     if [ "$current_version" != "$latest_version" ]; then
-        curl -sL ${log-tracer_url}/${latest_version}/log-tracer-${latest_version}.jar -o /tmp/log-tracer-${latest_version}.jar
+        curl -sL ${log_tracer_url}/${latest_version}/log-tracer-${latest_version}.jar -o /tmp/log-tracer-${latest_version}.jar
         unzip -qo /tmp/log-tracer-${latest_version}.jar log-tracer -d /tmp
         bash /tmp/log-tracer --install
     else
@@ -123,12 +123,12 @@ case "$1" in
     -h)
     echo "usage: log-tracer --version"
     echo "usage: log-tracer --selfupdate"
-    java -jar ${log-tracer_archive}/log-tracer-current.jar -h
+    java -jar ${log_tracer_archive}/log-tracer-current.jar -h
     ;;
     --selfupdate)
     selfupdate
     ;;
     *)
-    java -jar ${log-tracer_archive}/log-tracer-current.jar "$@"
+    java -jar ${log_tracer_archive}/log-tracer-current.jar "$@"
     ;;
 esac
