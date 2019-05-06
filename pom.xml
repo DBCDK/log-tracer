@@ -8,7 +8,7 @@
   <groupId>dk.dbc.kafka</groupId>
   <artifactId>log-tracer</artifactId>
   <packaging>jar</packaging>
-  <version>0.9</version>
+  <version>1.0</version>
   <name>log-tracer</name>
   <url>https://github.com/DBCDK/log-tracer/</url>
   <properties>
@@ -19,6 +19,14 @@
     <jackson.version>2.9.8</jackson.version>
     <slf4j.version>1.7.26</slf4j.version>
   </properties>
+
+  <distributionManagement>
+    <repository>
+      <id>mavenrepo.dbc.dk</id>
+      <name>DBC internal maven repository</name>
+      <url>http://mavenrepo.dbc.dk/content/repositories/releases</url>
+    </repository>
+  </distributionManagement>
 
   <dependencies>
     <dependency>
@@ -143,7 +151,7 @@
           </execution>
         </executions>
         <configuration>
-          <finalName>log-tracer</finalName>
+          <finalName>log-tracer-${project.version}</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <archive>
             <manifest>
