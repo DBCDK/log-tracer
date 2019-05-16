@@ -16,6 +16,7 @@ import dk.dbc.kafka.logformat.LogEventFormatterRaw;
 import dk.dbc.kafka.logformat.LogEventFormatterSortable;
 import org.slf4j.event.Level;
 
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
@@ -48,6 +49,8 @@ public class LogTracerApp {
             consumer = createKafkaConsumer(cli, logEventFilter);
         }
 
+        final ZoneId zoneId = ZoneId.of(cli.args.getString("time_zone"));
+
         final Iterator<LogEvent> iterator = consumer.iterator();
         while (true) {
             while (iterator.hasNext()) {
@@ -59,7 +62,7 @@ public class LogTracerApp {
                     switch (format) {
                         case "JAVA":
                             System.out.println(
-                                    LogEventFormatterJava.of(logEvent));
+                                    LogEventFormatterJava.of(logEvent, zoneId));
                             break;
                         case "SORTABLE":
                             System.out.println(

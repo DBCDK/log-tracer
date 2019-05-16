@@ -5,15 +5,16 @@
 
 package dk.dbc.kafka.logformat;
 
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class LogEventFormatterJava {
     private LogEventFormatterJava() {}
 
-    public static String of(LogEvent logEvent) {
+    public static String of(LogEvent logEvent, ZoneId zoneId) {
         final StringBuilder buffer = new StringBuilder();
-        appendBoxedField(buffer, logEvent.getTimestamp());
+        appendBoxedField(buffer, TimeStampFormatter.of(logEvent.getTimestamp(), zoneId));
         appendBoxedField(buffer, logEvent.getLevel());
         appendBoxedField(buffer, logEvent.getAppID());
         appendBoxedField(buffer, logEvent.getThread());

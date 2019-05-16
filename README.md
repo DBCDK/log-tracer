@@ -18,7 +18,7 @@ hours
 # installation
  
 ```bash
-curl -sL http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer/1.1/log-tracer-1.1.jar -o log-tracer-1.1.jar && unzip -op log-tracer-1.1.jar log-tracer | bash -s -- --install
+curl -sL http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer/1.2/log-tracer-1.2.jar -o log-tracer-1.2.jar && unzip -op log-tracer-1.2.jar log-tracer | bash -s -- --install
 ```
 
 Keep the installation up-to-date using the selfupdate action
@@ -40,9 +40,10 @@ instance and optional parameters if filtering is needed.
 $ log-tracer -h
 usage: log-tracer --version
 usage: log-tracer --selfupdate
-usage: log-tracer [-h] [-p PORT] [-t TOPIC] [-o {earliest,latest}] [-c CLIENTID] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format {RAW,SORTABLE,JAVA}] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL] (--from-file FROM_FILE | -b BROKER)
+usage: log-tracer [-h] [-p PORT] [-t TOPIC] [-o {earliest,latest}] [-c CLIENTID] [--log-host LOG_HOST] [--log-appid LOG_APPID] [--log-level {ERROR,WARN,INFO,DEBUG,TRACE}] [--format FORMAT] [-f] [--log-from LOG_FROM] [--log-until LOG_UNTIL] (--from-file FROM_FILE | -b BROKER |
+                  --time-zone TIME_ZONE)
 
-optional arguments:
+named arguments:
   -h, --help             show this help message and exit
   --from-file FROM_FILE  Input file containing either RAW or SORTABLE format
   -b BROKER, --broker BROKER
@@ -58,11 +59,13 @@ optional arguments:
   --log-appid LOG_APPID  Log application ID filter, repeatable
   --log-level {ERROR,WARN,INFO,DEBUG,TRACE}
                          Log level filter, get only level and above
-  --format {RAW,SORTABLE,JAVA}
-                         Output format
+  --format FORMAT        Output format, {RAW, SORTABLE, JAVA, CUSTOM}
+                         CUSTOM is a user-defined format where keys to look for in the log json can be specified with %(key).
+                         ex: --format "[%(level)] %(message)")
   -f, --follow           Consume log events continuously
-  --log-from LOG_FROM    Log timestamp from filter in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22
-  --log-until LOG_UNTIL  Log timestamp until filter in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22
+  --log-from LOG_FROM    Log timestamp from filter in localtime format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22
+  --log-until LOG_UNTIL  Log timestamp until filter in localtime format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22
+  --time-zone TIME_ZONE  Time-zone ID
 ```
 
 # filtering
