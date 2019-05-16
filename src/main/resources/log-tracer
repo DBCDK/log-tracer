@@ -129,6 +129,6 @@ case "$1" in
     selfupdate
     ;;
     *)
-    java -jar ${log_tracer_archive}/log-tracer-current.jar "$@"
+    java -jar ${log_tracer_archive}/log-tracer-current.jar ${LOG_TRACER_OPTS} "$@"
     ;;
 esac
