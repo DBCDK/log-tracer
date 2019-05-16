@@ -11,6 +11,9 @@ import java.time.format.DateTimeFormatter;
 
 public class TimeStampFormatter {
     public static String of(OffsetDateTime timestamp, ZoneId zoneId) {
+        if (timestamp == null) {
+            return "";
+        }
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME
                 .format(timestamp.atZoneSameInstant(zoneId));
     }
