@@ -63,10 +63,13 @@ public class Cli {
                 .help("Consume log events continuously");
         parser.addArgument("--log-from")
                 .action(new TimestampAction())
-                .help("Log timestamp from filter in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22");
+                .help("Log timestamp from filter in localtime format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22");
         parser.addArgument("--log-until")
                 .action(new TimestampAction())
-                .help("Log timestamp until filter in the format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22");
+                .help("Log timestamp until filter in localtime format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22");
+        source.addArgument("--time-zone")
+                .setDefault("Europe/Copenhagen")
+                .help("Time-zone ID");
 
         try {
             this.args = parser.parseArgs(args);
