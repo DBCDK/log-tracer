@@ -118,5 +118,17 @@ $ log-tracer ... --from-file sorted.log
 ```
 
 # log format
-The optimal JSON message format for all log-events
-`{"timestamp":"2017-01-22T15:22:57.567824034+02:00","sys_host":"cluster-node-7","sys_appid":"any-application-with-modern-logging","level":"DEBUG","message":"the log message", "stack_trace": ""}`
+
+### Fields
+| Field | Required | Format | Examples | Comments |
+| ----- | -------- | ------ | ------- | ----------- |
+| timestamp | yes | ISO 8601 with rfc 3339 profile | `2016-07-25T17:22:40.835692521+02:00`, `2016-07-25T17:22:40.835Z` | Basically the same logformat as used by logstash. An arbitrary number of decimal digits is technically allowed for the fractions of a second, but the parser expects 0, 3, 6 or 9 decimal points. |
+| message | yes | string | `Operation took 3 milliseconds` | Usually a human readable description of the event that is being logged. |
+| level | yes | string | `ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE` | Taken directly from SLF4J |
+| stack_trace | no | string | | Raw stacktrace as a string |
+| logger | no | string | `CleanUpBean` | Name of the logger that logged the event. |
+| thread | no | string | `worker-thread-1` | Name of the thread that logged the event. |
+| mdc | no | json | | Mapped Diagnostic Context (MDC) as nested JSON object. |
+| sys_appid | no | string | | Field containing an ID of the application it came from, which might include information such as the namespace it's running in. Use this to find all events across multiple instances of the same application. |
+| sys_taskid | no | string | | Field containing an ID of the _instance_ of the application it came from. Similar to `sys_appid`, but more specific since this can be used to identify events from a single instance of an application. |
+| sys_host | no | string | | Hostname of the server the application is running on. |
