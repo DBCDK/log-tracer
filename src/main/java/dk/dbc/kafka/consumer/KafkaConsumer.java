@@ -25,12 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class KafkaConsumer implements Consumer {
     private final Properties kafkaProperties;
     private final String topicName;
     private final LogEventMapper logEventMapper;
-    private long timestamp;
+    private Long fromEpochMilli;
 
     public KafkaConsumer(String hostname, Integer port, String topicName, String groupId, String offset, String clientID) {
         this.topicName = topicName;
@@ -39,7 +40,9 @@ public class KafkaConsumer implements Consumer {
     }
 
     public void setFromDateTime(OffsetDateTime dateTime) {
-        this.timestamp = dateTime.toInstant().toEpochMilli();
+        if (dateTime != null) {
+            this.fromEpochMilli = dateTime.toInstant().toEpochMilli();
+        }
     }
 
     @Override
@@ -48,7 +51,7 @@ public class KafkaConsumer implements Consumer {
             final org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka =
                     new org.apache.kafka.clients.consumer.KafkaConsumer<>(kafkaProperties);
             {
-                subscribe(kafka, topicName, timestamp);
+                subscribe(kafka, topicName);
             }
             
             final PriorityQueue<ConsumedItem> consumedItems =
@@ -65,7 +68,11 @@ public class KafkaConsumer implements Consumer {
 
             @Override
             public LogEvent next() {
-                return consumedItems.poll().toLogEvent();
+                final ConsumedItem consumedItem = consumedItems.poll();
+                if (consumedItem != null) {
+                    return consumedItem.toLogEvent();
+                }
+                return null;
             }
         };
     }
@@ -84,9 +91,9 @@ public class KafkaConsumer implements Consumer {
 
     private void subscribe(
             org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
-            String topicName, long timestamp) {
-        if (timestamp > 0) {
-            seekToOffsetsForTimestamp(kafka, topicName, timestamp);
+            String topicName) {
+        if (fromEpochMilli != null) {
+            seekToOffsetsForTimestamp(kafka, topicName, fromEpochMilli);
         } else {
             kafka.subscribe(Collections.singletonList(topicName));
         }
@@ -94,21 +101,49 @@ public class KafkaConsumer implements Consumer {
 
     private void seekToOffsetsForTimestamp(
             org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
-            String topicName, long timestamp) {
+            String topicName, Long timestamp) {
 
-        final Map<TopicPartition, Long> startingPointByTimestamp = new HashMap<>();
+        // Get all partitions for topic.
         final List<PartitionInfo> topicPartitionInfo = kafka.partitionsFor(topicName);
+
+        // Look up the offsets for all partitions such that the returned offset for
+        // each partition is the earliest offset whose timestamp is greater than or
+        // equal to the given fromEpochMilli.
+        final Map<TopicPartition, Long> fromOffsets =
+                getOffsetsForTimestamp(kafka, topicName, topicPartitionInfo, timestamp);
+
+        seekToOffsets(kafka, fromOffsets);
+    }
+
+    private Map<TopicPartition, Long> getOffsetsForTimestamp(
+            final org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
+            final String topicName,
+            final List<PartitionInfo> topicPartitionInfo,
+            final Long timestamp) {
+
+        final Map<TopicPartition, Long> partitionsTimestamp = new HashMap<>();
         for (PartitionInfo pi : topicPartitionInfo) {
-            startingPointByTimestamp.put(new TopicPartition(topicName, pi.partition()), timestamp);
+            partitionsTimestamp.put(new TopicPartition(topicName, pi.partition()), timestamp);
         }
-        System.err.println("partitions and timestamps: " + startingPointByTimestamp);
-        final Map<TopicPartition, OffsetAndTimestamp> startingPointByOffset =
-                kafka.offsetsForTimes(startingPointByTimestamp);
-        System.err.println("partitions and offsets: " + startingPointByOffset);
-        kafka.assign(startingPointByOffset.keySet());
-        for (Map.Entry<TopicPartition, OffsetAndTimestamp> entry : startingPointByOffset.entrySet()) {
+
+        final Map<TopicPartition, OffsetAndTimestamp> topicPartitionOffsetAndTimestampMap =
+                kafka.offsetsForTimes(partitionsTimestamp);
+
+        // Map <TopicPartition, OffsetAndTimestamp> to <TopicPartition, Long>.
+        return topicPartitionOffsetAndTimestampMap.entrySet().stream()
+                .filter(e -> e.getValue() != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().offset()));
+    }
+
+    private void seekToOffsets(final org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
+                               final Map<TopicPartition, Long> offsets) {
+        System.err.println("partitions and offsets: " + offsets);
+        kafka.assign(offsets.keySet());
+        for (Map.Entry<TopicPartition, Long> entry : offsets.entrySet()) {
             if (entry.getValue() != null) {
-                kafka.seek(entry.getKey(), entry.getValue().offset());
+                kafka.seek(entry.getKey(), entry.getValue());
             }
         }
     }
