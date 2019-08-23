@@ -18,7 +18,7 @@ hours
 # installation
  
 ```bash
-curl -sL http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer/1.3/log-tracer-1.3.jar -o log-tracer-1.3.jar && unzip -op log-tracer-1.3.jar log-tracer | bash -s -- --install
+curl -sL http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer/1.4/log-tracer-1.4.jar -o log-tracer-1.4.jar && unzip -op log-tracer-1.4.jar log-tracer | bash -s -- --install
 ```
 
 Keep the installation up-to-date using the selfupdate action
@@ -67,6 +67,9 @@ named arguments:
   --log-until LOG_UNTIL  Log timestamp until filter in localtime format yyyy-MM-dd'T'HH:mm i.e. 2017-01-22T13:22
   --time-zone TIME_ZONE  Time-zone ID
 ```
+
+# caveat
+The --log-until option is currently broken. It has a high risk of simple missing log event from the wanted interval.
 
 # filtering
 Note that you are able to filter the log-events
