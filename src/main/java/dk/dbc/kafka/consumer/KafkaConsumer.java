@@ -28,10 +28,10 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 public class KafkaConsumer implements Consumer {
-    private final Properties kafkaProperties;
-    private final String topicName;
-    private final LogEventMapper logEventMapper;
-    private Long fromEpochMilli;
+    final Properties kafkaProperties;
+    final String topicName;
+    final LogEventMapper logEventMapper;
+    Long fromEpochMilli;
 
     public KafkaConsumer(String hostname, Integer port, String topicName, String groupId, String offset, String clientID) {
         this.topicName = topicName;
@@ -115,7 +115,7 @@ public class KafkaConsumer implements Consumer {
         seekToOffsets(kafka, fromOffsets);
     }
 
-    private Map<TopicPartition, Long> getOffsetsForTimestamp(
+    Map<TopicPartition, Long> getOffsetsForTimestamp(
             final org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
             final String topicName,
             final List<PartitionInfo> topicPartitionInfo,
@@ -148,7 +148,7 @@ public class KafkaConsumer implements Consumer {
         }
     }
 
-    private class ConsumedItem {
+    class ConsumedItem {
         private final LogEvent logEvent;
 
         ConsumedItem(ConsumerRecord<String, byte[]> consumerRecord) {
@@ -177,7 +177,7 @@ public class KafkaConsumer implements Consumer {
         }
     }
 
-    private static class ConsumedItemComparator implements Comparator<ConsumedItem> {
+    static class ConsumedItemComparator implements Comparator<ConsumedItem> {
         @Override
         public int compare(ConsumedItem a, ConsumedItem b) {
             long byTimestamp = a.toLogEvent().getTimestamp().toInstant().toEpochMilli()
