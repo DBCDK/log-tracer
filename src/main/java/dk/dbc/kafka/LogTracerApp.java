@@ -5,6 +5,7 @@
 
 package dk.dbc.kafka;
 
+import dk.dbc.kafka.consumer.BoundedKafkaConsumer;
 import dk.dbc.kafka.consumer.Consumer;
 import dk.dbc.kafka.consumer.FileConsumer;
 import dk.dbc.kafka.consumer.KafkaConsumer;
@@ -118,13 +119,25 @@ public class LogTracerApp {
     }
 
     private static Consumer createKafkaConsumer(Cli cli, LogEventFilter filter) {
-        final KafkaConsumer consumer = new KafkaConsumer(
-                cli.args.getString("broker"),
-                cli.args.getInt("port"),
-                cli.args.getString("topic"),
-                UUID.randomUUID().toString(),
-                cli.args.getString("offset"),
-                cli.args.getString("clientid"));
+        final KafkaConsumer consumer;
+        if (filter.getUntil() != null) {
+            consumer = new BoundedKafkaConsumer(
+                    cli.args.getString("broker"),
+                    cli.args.getInt("port"),
+                    cli.args.getString("topic"),
+                    UUID.randomUUID().toString(),
+                    cli.args.getString("offset"),
+                    cli.args.getString("clientid"),
+                    filter.getUntil().toInstant().toEpochMilli());
+        } else {
+            consumer = new KafkaConsumer(
+                    cli.args.getString("broker"),
+                    cli.args.getInt("port"),
+                    cli.args.getString("topic"),
+                    UUID.randomUUID().toString(),
+                    cli.args.getString("offset"),
+                    cli.args.getString("clientid"));
+        }
 
         if (filter.getFrom() != null) {
             consumer.setFromDateTime(filter.getFrom());

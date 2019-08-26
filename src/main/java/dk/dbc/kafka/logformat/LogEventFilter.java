@@ -34,6 +34,10 @@ public class LogEventFilter implements Predicate<LogEvent> {
         return this;
     }
 
+    public OffsetDateTime getUntil() {
+        return until;
+    }
+
     public LogEventFilter setAppIDs(Set<String> appIDs) {
         this.appIDs = appIDs;
         return this;
