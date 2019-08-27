@@ -9,7 +9,7 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class LogEventFormatterJava {
+public class LogEventFormatterJava extends LogEventFormatter {
     private LogEventFormatterJava() {}
 
     public static String of(LogEvent logEvent, ZoneId zoneId) {
@@ -33,33 +33,6 @@ public class LogEventFormatterJava {
             buffer.append(stacktrace);
         }
         return buffer.toString();
-    }
-
-    private static <T> void appendField(StringBuilder buffer, T fieldValue) {
-        if (fieldValue != null) {
-            buffer.append(fieldValue.toString());
-        } else {
-            buffer.append('-');
-        }
-        buffer.append(' ');
-    }
-
-    private static <T> void appendBoxedField(StringBuilder buffer, T fieldValue) {
-        buffer.append("[");
-        if (fieldValue != null) {
-            buffer.append(fieldValue.toString());
-        } else {
-            buffer.append('-');
-        }
-        buffer.append("] ");
-    }
-
-    private static void appendLogger(StringBuilder buffer, String logger) {
-        if (logger != null) {
-            appendField(buffer, logger.substring(logger.lastIndexOf('.') + 1));
-        } else {
-            buffer.append("- ");
-        }
     }
 
     private static void appendMdc(StringBuilder buffer, Map<String, String> mdc) {
