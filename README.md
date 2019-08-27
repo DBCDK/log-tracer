@@ -68,9 +68,6 @@ named arguments:
   --time-zone TIME_ZONE  Time-zone ID
 ```
 
-# caveat
-The --log-until option is currently broken. It has a high risk of simple missing log event from the wanted interval.
-
 # filtering
 Note that you are able to filter the log-events
 ```bash
