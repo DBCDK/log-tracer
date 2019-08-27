@@ -18,7 +18,7 @@ hours
 # installation
  
 ```bash
-curl -sL http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer/1.4/log-tracer-1.4.jar -o log-tracer-1.4.jar && unzip -op log-tracer-1.4.jar log-tracer | bash -s -- --install
+curl -sL http://mavenrepo.dbc.dk/content/repositories/releases/dk/dbc/kafka/log-tracer/1.5/log-tracer-1.5.jar -o log-tracer-1.5.jar && unzip -op log-tracer-1.5.jar log-tracer | bash -s -- --install
 ```
 
 Keep the installation up-to-date using the selfupdate action
