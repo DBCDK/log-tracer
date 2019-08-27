@@ -15,9 +15,11 @@ import org.apache.kafka.common.TopicPartition;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 public class BoundedKafkaConsumer extends KafkaConsumer {
@@ -45,7 +47,7 @@ public class BoundedKafkaConsumer extends KafkaConsumer {
 
             @Override
             public boolean hasNext() {
-                if (consumedItems.isEmpty() || consumedItems.size() < 400) {
+                if (consumedItems.isEmpty()) {
                     consumeItems();
                 }
                 return !consumedItems.isEmpty();
@@ -88,6 +90,7 @@ public class BoundedKafkaConsumer extends KafkaConsumer {
     private class ConsumerRecordRange {
         private final org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka;
         private final List<PartitionRange> partitionRanges;
+        private final Map<Integer, PartitionRange> partitionRangeIndex;
 
         ConsumerRecordRange(
                 final org.apache.kafka.clients.consumer.KafkaConsumer<String, byte[]> kafka,
@@ -124,6 +127,7 @@ public class BoundedKafkaConsumer extends KafkaConsumer {
             System.err.println("until offsets: " + untilOffsets);
 
             partitionRanges = getPartitionRanges(fromOffsets, untilOffsets);
+            partitionRangeIndex = getPartitionRangeIndex(partitionRanges);
 
             System.err.println("partition ranges: " + partitionRanges);
 
@@ -167,18 +171,21 @@ public class BoundedKafkaConsumer extends KafkaConsumer {
             return lastCommittedOffsetAndMetadata.offset();
         }
 
-        boolean isInRange(ConsumerRecord<String, byte[]> record) {
-            final PartitionRange partitionRange = partitionRanges.get(0);
-            if (partitionRange.getPartitionId() != record.partition()) {
-                // Partition is no longer registered amongst the partition ranges,
-                // which indicates that the partition has been exhausted.
-                return false;
+        private Map<Integer, PartitionRange> getPartitionRangeIndex(List<PartitionRange> partitionRanges) {
+            final Map<Integer, PartitionRange> index = new HashMap<>();
+            for (PartitionRange partitionRange : partitionRanges) {
+                index.put(partitionRange.getPartitionId(), partitionRange);
             }
+            return index;
+        }
+
+        boolean isInRange(ConsumerRecord<String, byte[]> record) {
+            final PartitionRange partitionRange = partitionRangeIndex.get(record.partition());
             if (record.offset() >= partitionRange.getUntilOffset()) {
                 // Upper bound is reached for the partitioner,
-                // remove its partition range entry.
-                partitionRanges.remove(0);
-                if (!isExhausted()) {
+                // remove its partition range entry if it still exists.
+                final boolean removed = partitionRanges.remove(partitionRange);
+                if (removed && !isExhausted()) {
                     // Go to next partition range.
                     seekToOffset(partitionRanges.get(0));
                 }
@@ -232,6 +239,34 @@ public class BoundedKafkaConsumer extends KafkaConsumer {
                     ", fromOffset=" + fromOffset +
                     ", untilOffset=" + untilOffset +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            PartitionRange that = (PartitionRange) o;
+
+            if (fromOffset != that.fromOffset) {
+                return false;
+            }
+            if (untilOffset != that.untilOffset) {
+                return false;
+            }
+            return Objects.equals(topicPartition, that.topicPartition);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = topicPartition != null ? topicPartition.hashCode() : 0;
+            result = 31 * result + (int) (fromOffset ^ (fromOffset >>> 32));
+            result = 31 * result + (int) (untilOffset ^ (untilOffset >>> 32));
+            return result;
         }
     }
 }
