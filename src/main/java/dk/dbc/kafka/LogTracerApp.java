@@ -13,6 +13,7 @@ import dk.dbc.kafka.logformat.LogEvent;
 import dk.dbc.kafka.logformat.LogEventFilter;
 import dk.dbc.kafka.logformat.LogEventFormaterCustom;
 import dk.dbc.kafka.logformat.LogEventFormatterJava;
+import dk.dbc.kafka.logformat.LogEventFormatterPython;
 import dk.dbc.kafka.logformat.LogEventFormatterRaw;
 import dk.dbc.kafka.logformat.LogEventFormatterSortable;
 import org.slf4j.event.Level;
@@ -64,6 +65,10 @@ public class LogTracerApp {
                         case "JAVA":
                             System.out.println(
                                     LogEventFormatterJava.of(logEvent, zoneId));
+                            break;
+                        case "PYTHON":
+                            System.out.println(LogEventFormatterPython.of(
+                                logEvent, zoneId));
                             break;
                         case "SORTABLE":
                             System.out.println(
