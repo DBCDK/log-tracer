@@ -16,7 +16,7 @@
     <kafka.version>2.2.0</kafka.version>
     <apache.commons-text.version>1.6</apache.commons-text.version>
     <mockito.version>2.27.0</mockito.version>
-    <jackson.version>2.9.9</jackson.version>
+    <jackson.version>2.10.0</jackson.version>
     <slf4j.version>1.7.26</slf4j.version>
   </properties>
 
