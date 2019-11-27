@@ -54,7 +54,7 @@ public class Cli {
                 .help("Log level filter, get only level and above");
         parser.addArgument("--format")
                 .setDefault("RAW")
-                .help("Output format, {RAW, SORTABLE, JAVA, CUSTOM}\n" +
+                .help("Output format, {RAW, SORTABLE, JAVA, PYTHON, CUSTOM}\n" +
                     "CUSTOM is a user-defined format where keys to look for " +
                     "in the log json can be specified with %(key).\n" +
                     "ex: --format \"[%(level)] %(message)\")");
