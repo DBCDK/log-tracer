@@ -12,14 +12,14 @@ public class LogEventFormatterPython extends LogEventFormatter {
         appendBoxedField(buffer, logEvent.getTaskId());
         appendLogger(buffer, logEvent.getLogger());
         final String message = logEvent.getMessage();
-        final String stacktrace = logEvent.getStacktrace();
+        final String exceptionInfo = logEvent.getExceptionInfo();
         if (message != null && !message.isEmpty()) {
             buffer.append(message);
-            if (stacktrace != null && !stacktrace.isEmpty()) {
-                buffer.append('\n').append(stacktrace);
+            if (exceptionInfo != null && !exceptionInfo.isEmpty()) {
+                buffer.append('\n').append(exceptionInfo);
             }
-        } else if(stacktrace != null && !stacktrace.isEmpty()) {
-            buffer.append(stacktrace);
+        } else if(exceptionInfo != null && !exceptionInfo.isEmpty()) {
+            buffer.append(exceptionInfo);
         }
         return buffer.toString();
     }

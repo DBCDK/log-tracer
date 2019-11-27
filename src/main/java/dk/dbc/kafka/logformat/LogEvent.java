@@ -29,6 +29,8 @@ public class LogEvent {
     private Boolean json;
     @JsonProperty("stack_trace")
     private String stacktrace;
+    @JsonProperty("exc_info")
+    private String exceptionInfo;
 
     private Level level;
     private String message;
@@ -79,6 +81,14 @@ public class LogEvent {
 
     public String getStacktrace() {
         return stacktrace;
+    }
+
+    public String getExceptionInfo() {
+        return exceptionInfo;
+    }
+
+    public void setExceptionInfo(String exceptionInfo) {
+        this.exceptionInfo = exceptionInfo;
     }
 
     public void setStacktrace(String stacktrace) {
