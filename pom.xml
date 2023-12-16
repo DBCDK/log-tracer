@@ -24,7 +24,7 @@
     <repository>
       <id>mavenrepo.dbc.dk</id>
       <name>DBC internal maven repository</name>
-      <url>http://mavenrepo.dbc.dk/content/repositories/releases</url>
+      <url>https://mavenrepo.dbc.dk/content/repositories/releases</url>
     </repository>
   </distributionManagement>
 
